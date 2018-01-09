@@ -5,6 +5,7 @@ PyBullet Gym
 
 OpenAI gym is currently one of the most widely used toolkit for developing and comparing reinforcement learning algorithms. Unfortunately, for several challenging continuous control environments it requires the user to install MuJoCo, a commercial physics engine which requires a license to run for longer than 30 days. Such a commercial barrier hinders open research, especially in the perspective that other appropriate physics engines exist. This repository provides alternative implementations of the original MuJoCo environments which can be used for free. The environments have been reimplemented using [BulletPhysics'](https://github.com/bulletphysics/bullet3) python wrapper pybullet, such that they seamlessly integrate into the OpenAI gym framework. In order to show the usability of the new environments, several RL agents from the [Keras-RL](https://github.com/matthiasplappert/keras-rl/wiki/Agent-Overview) are configured to be trained out of the box. To further simplify the training of agents, a Trainer class was implemented which helps to capture commandline arguments in a unified fashion. The trainer provides a set of standard arguments, but additional arguments can be defined by the agent and the environment to enable the researcher to provide special parameters to either one.
 
+<!--
 !PLEASE REVIEW ALL THIS INFORMATION BEFORE PUBLISHING!
 
 
@@ -99,11 +100,14 @@ See the 'examples' directory.
 
 ##Add all examples
 
+-->
+
 ## What's new
 
-* 2018-01-05 Pybullet-gym is born.
+* 2018-01-09 Pybullet-gym is born.
 
 ## Roadmap
 1. Replicate Gym MuJoCo environments.
-3. Explore multiplayer games.
+2. Implement DeepMind Control Suite gyms.
+3. Explore other types of gyms/multi agent gyms.
 
