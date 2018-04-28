@@ -267,7 +267,7 @@ class Joint:
 	def set_state(self, x, vx):
 		p.resetJointState(self.bodies[self.bodyIndex], self.jointIndex, x, vx)
 
-	def current_position(self): # just some synonyme method
+	def current_position(self): # just some synonym method
 		return self.get_state()
 
 	def current_relative_position(self):
@@ -278,7 +278,7 @@ class Joint:
 
 		if self.jointMaxVelocity > 0:
 			vel /= self.jointMaxVelocity
-		elif self.jointType == 0: # JOINT_REVOLUTE_TYPE
+		elif self.jointType == 0:  # JOINT_REVOLUTE_TYPE
 			vel *= 0.1
 		else:
 			vel *= 0.5
@@ -305,13 +305,13 @@ class Joint:
 	def set_velocity(self, velocity):
 		p.setJointMotorControl2(self.bodies[self.bodyIndex],self.jointIndex,p.VELOCITY_CONTROL, targetVelocity=velocity)
 
-	def set_motor_torque(self, torque): # just some synonyme method
+	def set_motor_torque(self, torque): # just some synonym method
 		self.set_torque(torque)
 
 	def set_torque(self, torque):
 		p.setJointMotorControl2(bodyIndex=self.bodies[self.bodyIndex], jointIndex=self.jointIndex, controlMode=p.TORQUE_CONTROL, force=torque) #, positionGain=0.1, velocityGain=0.1)
 
-	def reset_current_position(self, position, velocity): # just some synonyme method
+	def reset_current_position(self, position, velocity): # just some synonym method
 		self.reset_position(position, velocity)
 
 	def reset_position(self, position, velocity):
