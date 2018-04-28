@@ -49,7 +49,10 @@ class XmlBasedRobot:
 				part_name = part_name.decode("utf8")
 				parts[part_name] = BodyPart(part_name, bodies, i, -1)
 			for j in range(p.getNumJoints(bodies[i])):
-				_,joint_name,_,_,_,_,_,_,_,_,_,_,part_name,_,_,_,_ = p.getJointInfo(bodies[i], j)
+				joint_info = p.getJointInfo(bodies[i], j)
+
+				joint_name = joint_info[1]
+				part_name = joint_info[12]
 
 				joint_name = joint_name.decode("utf8")
 				part_name = part_name.decode("utf8")
@@ -260,8 +263,12 @@ class Joint:
 		self.bodyIndex = bodyIndex
 		self.jointIndex = jointIndex
 		self.joint_name = joint_name
-		_,_,self.jointType,_,_,_,_,_,self.lowerLimit, self.upperLimit,_,self.jointMaxVelocity,_,_,_,_,_ = p.getJointInfo(self.bodies[self.bodyIndex], self.jointIndex)
+		joint_info = p.getJointInfo(self.bodies[self.bodyIndex], self.jointIndex)
+		self.jointType = joint_info[2]
+		self.lowerLimit = joint_info[8]
+		self.upperLimit = joint_info[9]
 		self.jointHasLimits = self.lowerLimit < self.upperLimit
+		self.jointMaxVelocity = joint_info[11]
 		self.power_coeff = 0
 
 	def set_state(self, x, vx):
