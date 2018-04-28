@@ -99,7 +99,7 @@ class MJCFBasedRobot(XmlBasedRobot):
 	def reset(self):
 		self.ordered_joints = []
 
-		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "robots", "mjcf", self.model_xml)
+		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "mjcf", self.model_xml)
 
 		if self.self_collision:
 			self.parts, self.jdict, self.ordered_joints, self.robot_body = self.addToScene(
@@ -260,7 +260,8 @@ class Joint:
 		self.bodyIndex = bodyIndex
 		self.jointIndex = jointIndex
 		self.joint_name = joint_name
-		_,_,_,_,_,_,_,_,self.lowerLimit, self.upperLimit,_,_,_,_,_,_,_ = p.getJointInfo(self.bodies[self.bodyIndex], self.jointIndex)
+		_,_,self.jointType,_,_,_,_,_,self.lowerLimit, self.upperLimit,_,self.jointMaxVelocity,_,_,_,_,_ = p.getJointInfo(self.bodies[self.bodyIndex], self.jointIndex)
+		self.jointHasLimits = self.lowerLimit < self.upperLimit
 		self.power_coeff = 0
 
 	def set_state(self, x, vx):
@@ -271,10 +272,19 @@ class Joint:
 
 	def current_relative_position(self):
 		pos, vel = self.get_state()
-		pos_mid = 0.5 * (self.lowerLimit + self.upperLimit);
+		if self.jointHasLimits:
+			pos_mid = 0.5 * (self.lowerLimit + self.upperLimit)
+			pos = 2 * (pos - pos_mid) / (self.upperLimit - self.lowerLimit)
+
+		if self.jointMaxVelocity > 0:
+			vel /= self.jointMaxVelocity
+		elif self.jointType == 0: # JOINT_REVOLUTE_TYPE
+			vel *= 0.1
+		else:
+			vel *= 0.5
 		return (
-			2 * (pos - pos_mid) / (self.upperLimit - self.lowerLimit),
-			0.1 * vel
+			pos,
+			vel
 		)
 
 	def get_state(self):
