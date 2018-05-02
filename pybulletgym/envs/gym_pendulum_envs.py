@@ -1,21 +1,35 @@
 from .scenes.scene_bases import SingleRobotEmptyScene
 from .env_bases import BaseBulletEnv
 from .robots.robot_pendula import InvertedPendulum, InvertedPendulumSwingup, InvertedDoublePendulum
+import gym, gym.spaces, gym.utils, gym.utils.seeding
 import numpy as np
+import pybullet as p
+import os, sys
 
 class InvertedPendulumBulletEnv(BaseBulletEnv):
 	def __init__(self):
 		self.robot = InvertedPendulum()
 		BaseBulletEnv.__init__(self, self.robot)
+		self.stateId=-1
 
 	def create_single_player_scene(self):
 		return SingleRobotEmptyScene(gravity=9.8, timestep=0.0165, frame_skip=1)
+
+	def _reset(self):
+		if (self.stateId>=0):
+			#print("InvertedPendulumBulletEnv reset p.restoreState(",self.stateId,")")
+			p.restoreState(self.stateId)
+		r = BaseBulletEnv._reset(self)
+		if (self.stateId<0):
+			self.stateId = p.saveState()
+			#print("InvertedPendulumBulletEnv reset self.stateId=",self.stateId)
+		return r
 
 	def _step(self, a):
 		self.robot.apply_action(a)
 		self.scene.global_step()
 		state = self.robot.calc_state()  # sets self.pos_x self.pos_y
-		#vel_penalty = 0
+		vel_penalty = 0
 		if self.robot.swingup:
 			reward = np.cos(self.robot.theta)
 			done = False
@@ -33,14 +47,23 @@ class InvertedPendulumSwingupBulletEnv(InvertedPendulumBulletEnv):
 	def __init__(self):
 		self.robot = InvertedPendulumSwingup()
 		BaseBulletEnv.__init__(self, self.robot)
+		self.stateId=-1
 
 class InvertedDoublePendulumBulletEnv(BaseBulletEnv):
 	def __init__(self):
 		self.robot = InvertedDoublePendulum()
 		BaseBulletEnv.__init__(self, self.robot)
-
+		self.stateId = -1
 	def create_single_player_scene(self):
 		return SingleRobotEmptyScene(gravity=9.8, timestep=0.0165, frame_skip=1)
+
+	def _reset(self):
+		if (self.stateId>=0):
+			p.restoreState(self.stateId)
+		r = BaseBulletEnv._reset(self)
+		if (self.stateId<0):
+			self.stateId = p.saveState()
+		return r
 
 	def _step(self, a):
 		self.robot.apply_action(a)

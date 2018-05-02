@@ -2,6 +2,9 @@ from .robot_bases import XmlBasedRobot, MJCFBasedRobot, URDFBasedRobot
 import numpy as np
 from ..utils import gym_utils as ObjectHelper
 import pybullet as p
+import os
+import pybullet_data
+from .robot_bases import BodyPart
 
 
 class WalkerBase(XmlBasedRobot):
@@ -11,6 +14,7 @@ class WalkerBase(XmlBasedRobot):
 		self.start_pos_x, self.start_pos_y, self.start_pos_z = 0, 0, 0
 		self.walk_target_x = 1e3  # kilometer away
 		self.walk_target_y = 0
+		self.body_xyz=[0,0,0]
 
 	def robot_specific_reset(self):
 		for j in self.ordered_joints:
@@ -64,6 +68,16 @@ class WalkerBase(XmlBasedRobot):
 	def calc_potential(self):
 		# progress in potential field is speed*dt, typical speed is about 2-3 meter per second, this potential will change 2-3 per frame (not per second),
 		# all rewards have rew/frame units and close to 1.0
+		debugmode=0
+		if (debugmode):
+			print("calc_potential: self.walk_target_dist")
+			print(self.walk_target_dist)
+			print("self.scene.dt")
+			print(self.scene.dt)
+			print("self.scene.frame_skip")
+			print(self.scene.frame_skip)
+			print("self.scene.timestep")
+			print(self.scene.timestep)
 		return - self.walk_target_dist / self.scene.dt
 
 
@@ -119,7 +133,7 @@ class Ant(WalkerBase, MJCFBasedRobot):
 	foot_list = ['front_left_foot', 'front_right_foot', 'left_back_foot', 'right_back_foot']
 
 	def __init__(self):
-		WalkerBase.__init__(self, power=10.5)
+		WalkerBase.__init__(self, power=2.5)
 		MJCFBasedRobot.__init__(self, "ant.xml", "torso", action_dim=8, obs_dim=28)
 
 	def alive_bonus(self, z, pitch):
@@ -148,23 +162,25 @@ class Humanoid(WalkerBase, MJCFBasedRobot):
 		self.motor_names += ["left_shoulder1", "left_shoulder2", "left_elbow"]
 		self.motor_power += [75, 75, 75]
 		self.motors = [self.jdict[n] for n in self.motor_names]
-		# if self.random_yaw: # TODO: Make leaning work as soon as the rest works
-		# 	cpose = cpp_household.Pose()
-		# 	yaw = self.np_random.uniform(low=-3.14, high=3.14)
-		# 	if self.random_lean and self.np_random.randint(2)==0:
-		# 		cpose.set_xyz(0, 0, 1.4)
-		# 		if self.np_random.randint(2)==0:
-		# 			pitch = np.pi/2
-		# 			cpose.set_xyz(0, 0, 0.45)
-		# 		else:
-		# 			pitch = np.pi*3/2
-		# 			cpose.set_xyz(0, 0, 0.25)
-		# 		roll = 0
-		# 		cpose.set_rpy(roll, pitch, yaw)
-		# 	else:
-		# 		cpose.set_xyz(0, 0, 1.4)
-		# 		cpose.set_rpy(0, 0, yaw)  # just face random direction, but stay straight otherwise
-		# 	self.cpp_robot.set_pose_and_speed(cpose, 0,0,0)
+		if self.random_yaw:
+			position = [0,0,0]
+			orientation = [0,0,0]
+			yaw = self.np_random.uniform(low=-3.14, high=3.14)
+			if self.random_lean and self.np_random.randint(2)==0:
+				cpose.set_xyz(0, 0, 1.4)
+				if self.np_random.randint(2)==0:
+					pitch = np.pi/2
+					position = [0, 0, 0.45]
+				else:
+					pitch = np.pi*3/2
+					position = [0, 0, 0.25]
+				roll = 0
+				orientation = [roll, pitch, yaw]
+			else:
+				position = [0, 0, 1.4]
+				orientation = [0, 0, yaw]  # just face random direction, but stay straight otherwise
+			self.robot_body.reset_position(position)
+			self.robot_body.reset_orientation(orientation)
 		self.initial_z = 0.8
 
 	random_yaw = False
@@ -174,16 +190,34 @@ class Humanoid(WalkerBase, MJCFBasedRobot):
 		assert( np.isfinite(a).all() )
 		force_gain = 1
 		for i, m, power in zip(range(17), self.motors, self.motor_power):
-			m.set_motor_torque( float(force_gain * power*self.power*a[i]) )
-			#m.set_motor_torque(float(force_gain * power * self.power * np.clip(a[i], -1, +1)))
+			m.set_motor_torque(float(force_gain * power * self.power * np.clip(a[i], -1, +1)))
 
 	def alive_bonus(self, z, pitch):
 		return +2 if z > 0.78 else -1   # 2 here because 17 joints produce a lot of electricity cost just from policy noise, living must be better than dying
 
 
+
+
+def get_cube(x, y, z):
+	body = p.loadURDF(os.path.join(pybullet_data.getDataPath(),"cube_small.urdf"), x, y, z)
+	p.changeDynamics(body,-1, mass=1.2)#match Roboschool
+	part_name, _ = p.getBodyInfo(body, 0)
+	part_name = part_name.decode("utf8")
+	bodies = [body]
+	return BodyPart(part_name, bodies, 0, -1)
+
+
+def get_sphere(x, y, z):
+	body = p.loadURDF(os.path.join(pybullet_data.getDataPath(),"sphere2red_nocol.urdf"), x, y, z)
+	part_name, _ = p.getBodyInfo(body, 0)
+	part_name = part_name.decode("utf8")
+	bodies = [body]
+	return BodyPart(part_name, bodies, 0, -1)
+
 class HumanoidFlagrun(Humanoid):
 	def __init__(self):
 		Humanoid.__init__(self)
+		self.flag = None
 
 	def robot_specific_reset(self):
 		Humanoid.robot_specific_reset(self)
@@ -195,9 +229,15 @@ class HumanoidFlagrun(Humanoid):
 		more_compact = 0.5  # set to 1.0 whole football field
 		self.walk_target_x *= more_compact
 		self.walk_target_y *= more_compact
-		self.flag = None
-		self.flag = ObjectHelper.get_sphere(self.walk_target_x, self.walk_target_y, 0.2)
-		self.flag_timeout = 200
+
+		if (self.flag):
+			#for b in self.flag.bodies:
+			#	print("remove body uid",b)
+			#	p.removeBody(b)
+			p.resetBasePositionAndOrientation(self.flag.bodies[0],[self.walk_target_x, self.walk_target_y, 0.7],[0,0,0,1])
+		else:
+			self.flag = get_sphere(self.walk_target_x, self.walk_target_y, 0.7)
+		self.flag_timeout = 600/self.scene.frame_skip #match Roboschool
 
 	def calc_state(self):
 		self.flag_timeout -= 1
@@ -211,11 +251,19 @@ class HumanoidFlagrun(Humanoid):
 
 class HumanoidFlagrunHarder(HumanoidFlagrun):
 	def __init__(self):
-		HumanoidFlagrun.__init__()
+		HumanoidFlagrun.__init__(self)
+		self.flag = None
+		self.aggressive_cube = None
+		self.frame = 0
 
 	def robot_specific_reset(self):
 		HumanoidFlagrun.robot_specific_reset(self)
-		self.aggressive_cube = ObjectHelper.get_cube(-1.5,0,0.05)
+
+		self.frame = 0
+		if (self.aggressive_cube):
+			p.resetBasePositionAndOrientation(self.aggressive_cube.bodies[0],[-1.5,0,0.05],[0,0,0,1])
+		else:
+			self.aggressive_cube = get_cube(-1.5,0,0.05)
 		self.on_ground_frame_counter = 0
 		self.crawl_start_potential = None
 		self.crawl_ignored_potential = 0.0
@@ -243,6 +291,7 @@ class HumanoidFlagrunHarder(HumanoidFlagrun):
 		elif self.on_ground_frame_counter > 0:
 			self.on_ground_frame_counter -= 1
 		# End episode if the robot can't get up in 170 frames, to save computation and decorrelate observations.
+		self.frame += 1
 		return self.potential_leak() if self.on_ground_frame_counter<170 else -1
 
 	def potential_leak(self):

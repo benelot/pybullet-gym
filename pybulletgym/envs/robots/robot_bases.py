@@ -8,8 +8,14 @@ os.sys.path.insert(0,parentdir)
 
 
 class XmlBasedRobot:
+	"""
+	Base class for mujoco .xml based agents.
+	"""
+
+	self_collision = True
 	def __init__(self, robot_name, action_dim, obs_dim, self_collision):
 		self.parts = None
+		self.objects = []
 		self.jdict = None
 		self.ordered_joints = None
 		self.robot_body = None
@@ -49,10 +55,10 @@ class XmlBasedRobot:
 				part_name = part_name.decode("utf8")
 				parts[part_name] = BodyPart(part_name, bodies, i, -1)
 			for j in range(p.getNumJoints(bodies[i])):
-				joint_info = p.getJointInfo(bodies[i], j)
-
-				joint_name = joint_info[1]
-				part_name = joint_info[12]
+				p.setJointMotorControl2(bodies[i],j,p.POSITION_CONTROL,positionGain=0.1,velocityGain=0.1,force=0)
+				jointInfo = p.getJointInfo(bodies[i], j)
+				joint_name=jointInfo[1]
+				part_name=jointInfo[12]
 
 				joint_name = joint_name.decode("utf8")
 				part_name = part_name.decode("utf8")
@@ -94,23 +100,23 @@ class MJCFBasedRobot(XmlBasedRobot):
 	Base class for mujoco .xml based agents.
 	"""
 
-	def __init__(self, model_xml, robot_name, action_dim, obs_dim, self_collision=False):
+	def __init__(self, model_xml, robot_name, action_dim, obs_dim, self_collision=True):
 		XmlBasedRobot.__init__(self, robot_name, action_dim, obs_dim, self_collision)
-
 		self.model_xml = model_xml
-
+		self.doneLoading=0
 	def reset(self):
-		self.ordered_joints = []
 
 		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "mjcf", self.model_xml)
 
-		if self.self_collision:
-			self.parts, self.jdict, self.ordered_joints, self.robot_body = self.addToScene(
-				p.loadMJCF(full_path, flags=p.URDF_USE_SELF_COLLISION_EXCLUDE_ALL_PARENTS))
-		else:
-			self.parts, self.jdict, self.ordered_joints, self.robot_body = self.addToScene(
-				p.loadMJCF(full_path))
-
+		if (self.doneLoading==0):
+			self.ordered_joints = []
+			self.doneLoading=1
+			if self.self_collision:
+				self.objects = p.loadMJCF(full_path, flags=p.URDF_USE_SELF_COLLISION|p.URDF_USE_SELF_COLLISION_EXCLUDE_ALL_PARENTS)
+				self.parts, self.jdict, self.ordered_joints, self.robot_body = self.addToScene(self.objects	)
+			else:
+				self.objects = p.loadMJCF(full_path)
+				self.parts, self.jdict, self.ordered_joints, self.robot_body = self.addToScene(self.objects)
 		self.robot_specific_reset()
 
 		s = self.calc_state()  # optimization: calc_state() can calculate something in self.* for calc_potential() to use
@@ -238,6 +244,9 @@ class BodyPart:
 	def current_orientation(self):
 		return self.get_pose()[3:]
 
+	def get_orientation(self):
+		return self.current_orientation()
+
 	def reset_position(self, position):
 		p.resetBasePositionAndOrientation(self.bodies[self.bodyIndex], position, self.get_orientation())
 
@@ -245,7 +254,7 @@ class BodyPart:
 		p.resetBasePositionAndOrientation(self.bodies[self.bodyIndex], self.get_position(), orientation)
 
 	def reset_velocity(self, linearVelocity=[0,0,0], angularVelocity =[0,0,0]):
-		p.resetBaseVelocity(linearVelocity, angularVelocity)
+		p.resetBaseVelocity(self.bodies[self.bodyIndex], linearVelocity, angularVelocity)
 
 	def reset_pose(self, position, orientation):
 		p.resetBasePositionAndOrientation(self.bodies[self.bodyIndex], position, orientation)
@@ -263,6 +272,7 @@ class Joint:
 		self.bodyIndex = bodyIndex
 		self.jointIndex = jointIndex
 		self.joint_name = joint_name
+
 		joint_info = p.getJointInfo(self.bodies[self.bodyIndex], self.jointIndex)
 		self.jointType = joint_info[2]
 		self.lowerLimit = joint_info[8]
@@ -302,6 +312,10 @@ class Joint:
 		x, _ = self.get_state()
 		return x
 
+	def get_orientation(self):
+		_,r = self.get_state()
+		return r
+
 	def get_velocity(self):
 		_, vx = self.get_state()
 		return vx
@@ -326,4 +340,4 @@ class Joint:
 		self.disable_motor()
 
 	def disable_motor(self):
-		p.setJointMotorControl2(self.bodies[self.bodyIndex],self.jointIndex,controlMode=p.VELOCITY_CONTROL, force=0)
+		p.setJointMotorControl2(self.bodies[self.bodyIndex],self.jointIndex,controlMode=p.POSITION_CONTROL, targetPosition=0, targetVelocity=0, positionGain=0.1, velocityGain=0.1, force=0)
