@@ -1,41 +1,40 @@
-from .scenes.scene_stadium import StadiumScene
+from pybulletgym.envs.scene_stadium import StadiumScene
 from .env_bases import BaseBulletEnv
 import numpy as np
-import pybullet as p
-from .robots.robot_locomotors import Hopper, Walker2D, HalfCheetah, Ant, Humanoid, HumanoidFlagrun, HumanoidFlagrunHarder, Atlas
+import pybullet
+from pybulletgym.envs.robot_locomotors import Hopper, Walker2D, HalfCheetah, Ant, Humanoid, HumanoidFlagrun, HumanoidFlagrunHarder, Atlas
 
 
 class WalkerBaseBulletEnv(BaseBulletEnv):
 	def __init__(self, robot, render=False):
 		print("WalkerBase::__init__")
-		BaseBulletEnv.__init__(self, robot)
+		BaseBulletEnv.__init__(self, robot, render)
 		self.camera_x = 0
 		self.walk_target_x = 1e3  # kilometer away
 		self.walk_target_y = 0
 		self.stateId=-1
 
 
-	def create_single_player_scene(self):
-		self.stadium_scene = StadiumScene(gravity=9.8, timestep=0.0165/4, frame_skip=4)
+	def create_single_player_scene(self, bullet_client):
+		self.stadium_scene = StadiumScene(bullet_client, gravity=9.8, timestep=0.0165/4, frame_skip=4)
 		return self.stadium_scene
 
 	def _reset(self):
-		if (self.stateId>=0):
+		if self.stateId >= 0:
 			#print("restoreState self.stateId:",self.stateId)
-			p.restoreState(self.stateId)
+			self._p.restoreState(self.stateId)
 
 		r = BaseBulletEnv._reset(self)
-		p.configureDebugVisualizer(p.COV_ENABLE_RENDERING,0)
+		self._p.configureDebugVisualizer(pybullet.COV_ENABLE_RENDERING,0)
 
-		self.parts, self.jdict, self.ordered_joints, self.robot_body = self.robot.addToScene(
+		self.parts, self.jdict, self.ordered_joints, self.robot_body = self.robot.addToScene(self._p,
 			self.stadium_scene.ground_plane_mjcf)
 		self.ground_ids = set([(self.parts[f].bodies[self.parts[f].bodyIndex], self.parts[f].bodyPartIndex) for f in
 							   self.foot_ground_object_names])
-		p.configureDebugVisualizer(p.COV_ENABLE_RENDERING,1)
-		if (self.stateId<0):
-			self.stateId=p.saveState()
+		self._p.configureDebugVisualizer(pybullet.COV_ENABLE_RENDERING,1)
+		if self.stateId < 0:
+			self.stateId=self._p.saveState()
 			#print("saving state self.stateId:",self.stateId)
-
 
 		return r
 
@@ -73,20 +72,19 @@ class WalkerBaseBulletEnv(BaseBulletEnv):
 		for i,f in enumerate(self.robot.feet): # TODO: Maybe calculating feet contacts could be done within the robot code
 			contact_ids = set((x[2], x[4]) for x in f.contact_list())
 			#print("CONTACT OF '%d' WITH %d" % (contact_ids, ",".join(contact_names)) )
-			if (self.ground_ids & contact_ids):
-                        	#see Issue 63: https://github.com/openai/roboschool/issues/63
+			if self.ground_ids & contact_ids:
+                #see Issue 63: https://github.com/openai/roboschool/issues/63
 				#feet_collision_cost += self.foot_collision_cost
 				self.robot.feet_contact[i] = 1.0
 			else:
 				self.robot.feet_contact[i] = 0.0
 
-
 		electricity_cost  = self.electricity_cost  * float(np.abs(a*self.robot.joint_speeds).mean())  # let's assume we have DC motor with controller, and reverse current braking
 		electricity_cost += self.stall_torque_cost * float(np.square(a).mean())
 
 		joints_at_limit_cost = float(self.joints_at_limit_cost * self.robot.joints_at_limit)
-		debugmode=0
-		if(debugmode):
+		debugmode = 0
+		if debugmode:
 			print("alive=")
 			print(alive)
 			print("progress")
@@ -105,7 +103,7 @@ class WalkerBaseBulletEnv(BaseBulletEnv):
 			joints_at_limit_cost,
 			feet_collision_cost
 			]
-		if (debugmode):
+		if debugmode:
 			print("rewards=")
 			print(self.rewards)
 			print("sum rewards")
@@ -120,25 +118,30 @@ class WalkerBaseBulletEnv(BaseBulletEnv):
 		self.camera_x = 0.98*self.camera_x + (1-0.98)*x
 		self.camera.move_and_look_at(self.camera_x, y-2.0, 1.4, x, y, 1.0)
 
+
 class HopperBulletEnv(WalkerBaseBulletEnv):
 	def __init__(self):
 		self.robot = Hopper()
 		WalkerBaseBulletEnv.__init__(self, self.robot)
+
 
 class Walker2DBulletEnv(WalkerBaseBulletEnv):
 	def __init__(self):
 		self.robot = Walker2D()
 		WalkerBaseBulletEnv.__init__(self, self.robot)
 
+
 class HalfCheetahBulletEnv(WalkerBaseBulletEnv):
 	def __init__(self):
 		self.robot = HalfCheetah()
 		WalkerBaseBulletEnv.__init__(self, self.robot)
 
+
 class AntBulletEnv(WalkerBaseBulletEnv):
 	def __init__(self):
 		self.robot = Ant()
 		WalkerBaseBulletEnv.__init__(self, self.robot)
+
 
 class HumanoidBulletEnv(WalkerBaseBulletEnv):
 	def __init__(self, robot=Humanoid()):
@@ -147,6 +150,7 @@ class HumanoidBulletEnv(WalkerBaseBulletEnv):
 		self.electricity_cost  = 4.25*WalkerBaseBulletEnv.electricity_cost
 		self.stall_torque_cost = 4.25*WalkerBaseBulletEnv.stall_torque_cost
 
+
 class HumanoidFlagrunBulletEnv(HumanoidBulletEnv):
 	random_yaw = True
 
@@ -154,10 +158,11 @@ class HumanoidFlagrunBulletEnv(HumanoidBulletEnv):
 		self.robot = HumanoidFlagrun()
 		HumanoidBulletEnv.__init__(self, self.robot)
 
-	def create_single_player_scene(self):
-		s = HumanoidBulletEnv.create_single_player_scene(self)
+	def create_single_player_scene(self, bullet_client):
+		s = HumanoidBulletEnv.create_single_player_scene(self, bullet_client)
 		s.zero_at_running_strip_start_line = False
 		return s
+
 
 class HumanoidFlagrunHarderBulletEnv(HumanoidBulletEnv):
 	random_lean = True  # can fall on start
@@ -167,18 +172,19 @@ class HumanoidFlagrunHarderBulletEnv(HumanoidBulletEnv):
 		self.electricity_cost /= 4   # don't care that much about electricity, just stand up!
 		HumanoidBulletEnv.__init__(self, self.robot)
 
-	def create_single_player_scene(self):
-		s = HumanoidBulletEnv.create_single_player_scene(self)
+	def create_single_player_scene(self, bullet_client):
+		s = HumanoidBulletEnv.create_single_player_scene(self, bullet_client)
 		s.zero_at_running_strip_start_line = False
 		return s
+
 
 class AtlasBulletEnv(WalkerBaseBulletEnv):
 	def __init__(self):
 		self.robot = Atlas()
 		WalkerBaseBulletEnv.__init__(self, self.robot)
 
-	def create_single_player_scene(self):
-		self.stadium_scene = StadiumScene(gravity=9.8, timestep=0.0165/8, frame_skip=8)   # 8 instead of 4 here
+	def create_single_player_scene(self, bullet_client):
+		self.stadium_scene = StadiumScene(bullet_client, gravity=9.8, timestep=0.0165/8, frame_skip=8)   # 8 instead of 4 here
 		return self.stadium_scene
 
 	def robot_specific_reset(self):

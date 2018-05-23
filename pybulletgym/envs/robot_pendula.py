@@ -4,9 +4,10 @@ import numpy as np
 class InvertedPendulum(MJCFBasedRobot):
 	swingup = False
 	def __init__(self):
-		MJCFBasedRobot.__init__(self, 'inverted_pendulum.xml', 'cart', action_dim=1, obs_dim=4)
+		MJCFBasedRobot.__init__(self, 'inverted_pendulum.xml', 'cart', action_dim=1, obs_dim=5)
 
-	def robot_specific_reset(self):
+	def robot_specific_reset(self, bullet_client):
+		self._p = bullet_client
 		self.pole = self.parts["pole"]
 		self.slider = self.jdict["slider"]
 		self.j1 = self.jdict["hinge"]
@@ -43,7 +44,8 @@ class InvertedPendulum(MJCFBasedRobot):
 			theta_dot = 0
 
 		return np.array([
-			x, self.theta, vx, theta_dot
+			x, vx,
+			np.cos(self.theta), np.sin(self.theta), theta_dot
 			])
 
 class InvertedPendulumSwingup(InvertedPendulum):
@@ -54,7 +56,8 @@ class InvertedDoublePendulum(MJCFBasedRobot):
 	def __init__(self):
 		MJCFBasedRobot.__init__(self,  'inverted_double_pendulum.xml', 'cart', action_dim=1, obs_dim=9)
 
-	def robot_specific_reset(self):
+	def robot_specific_reset(self, bullet_client):
+		self._p = bullet_client
 		self.pole2 = self.parts["pole2"]
 		self.slider = self.jdict["slider"]
 		self.j1 = self.jdict["hinge"]

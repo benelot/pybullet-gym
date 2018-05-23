@@ -1,7 +1,8 @@
 import gym
 import numpy as np
-import pybullet_envs
-envs = [spec.id for spec in gym.envs.registry.all() if spec.id.find('Bullet') >= 0]
+import pybulletgym.envs
+import traceback
+envs = [spec.id for spec in gym.envs.registry.all() if spec.id.find('PyBullet') >= 0]
 bugged_envs = []
 for env_name in envs:
     try:
@@ -11,7 +12,7 @@ for env_name in envs:
         env.step(np.random.random(env.action_space.shape))
         print('[SUCCESS] ENV', env_name, '\n')
     except Exception as e:
-        print(env_name, ': ', e)
+        print(env_name, ': ', traceback.format_exc())
         bugged_envs.append(env_name)
         print('[FAIL] ENV', env_name, '\n')
 

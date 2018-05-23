@@ -1,6 +1,6 @@
 from .robot_bases import XmlBasedRobot, MJCFBasedRobot, URDFBasedRobot
 import numpy as np
-from ..utils import gym_utils as ObjectHelper
+from pybulletgym.envs.utils import gym_utils as ObjectHelper
 import pybullet as p
 import os
 import pybullet_data
@@ -16,7 +16,8 @@ class WalkerBase(XmlBasedRobot):
 		self.walk_target_y = 0
 		self.body_xyz=[0,0,0]
 
-	def robot_specific_reset(self):
+	def robot_specific_reset(self, bullet_client):
+		self._p = bullet_client
 		for j in self.ordered_joints:
 			j.reset_current_position(self.np_random.uniform(low=-0.1, high=0.1), 0)
 
@@ -102,8 +103,8 @@ class Walker2D(WalkerBase, MJCFBasedRobot):
 	def alive_bonus(self, z, pitch):
 		return +1 if z > 0.8 and abs(pitch) < 1.0 else -1
 
-	def robot_specific_reset(self):
-		WalkerBase.robot_specific_reset(self)
+	def robot_specific_reset(self, bullet_client):
+		WalkerBase.robot_specific_reset(self, bullet_client)
 		for n in ["foot_joint", "foot_left_joint"]:
 			self.jdict[n].power_coef = 30.0
 
@@ -119,8 +120,8 @@ class HalfCheetah(WalkerBase, MJCFBasedRobot):
 		# Use contact other than feet to terminate episode: due to a lot of strange walks using knees
 		return +1 if np.abs(pitch) < 1.0 and not self.feet_contact[1] and not self.feet_contact[2] and not self.feet_contact[4] and not self.feet_contact[5] else -1
 
-	def robot_specific_reset(self):
-		WalkerBase.robot_specific_reset(self)
+	def robot_specific_reset(self, bullet_client):
+		WalkerBase.robot_specific_reset(self, bullet_client)
 		self.jdict["bthigh"].power_coef = 120.0
 		self.jdict["bshin"].power_coef  = 90.0
 		self.jdict["bfoot"].power_coef  = 60.0
@@ -151,8 +152,8 @@ class Humanoid(WalkerBase, MJCFBasedRobot):
 		self.random_yaw = random_yaw
 		self.random_lean = random_lean
 
-	def robot_specific_reset(self):
-		WalkerBase.robot_specific_reset(self)
+	def robot_specific_reset(self, bullet_client):
+		WalkerBase.robot_specific_reset(self, bullet_client)
 		self.motor_names  = ["abdomen_z", "abdomen_y", "abdomen_x"]
 		self.motor_power  = [100, 100, 100]
 		self.motor_names += ["right_hip_x", "right_hip_z", "right_hip_y", "right_knee"]
@@ -199,8 +200,8 @@ class HumanoidFlagrun(Humanoid):
 		Humanoid.__init__(self)
 		self.flag = None
 
-	def robot_specific_reset(self):
-		Humanoid.robot_specific_reset(self)
+	def robot_specific_reset(self, bullet_client):
+		Humanoid.robot_specific_reset(self, bullet_client)
 		self.flag_reposition()
 
 	def flag_reposition(self):
@@ -214,9 +215,9 @@ class HumanoidFlagrun(Humanoid):
 			#for b in self.flag.bodies:
 			#	print("remove body uid",b)
 			#	p.removeBody(b)
-			p.resetBasePositionAndOrientation(self.flag.bodies[0],[self.walk_target_x, self.walk_target_y, 0.7], [0,0,0,1])
+			self._p.resetBasePositionAndOrientation(self.flag.bodies[0],[self.walk_target_x, self.walk_target_y, 0.7], [0,0,0,1])
 		else:
-			self.flag = ObjectHelper.get_sphere(self.walk_target_x, self.walk_target_y, 0.7)
+			self.flag = ObjectHelper.get_sphere(self._p, self.walk_target_x, self.walk_target_y, 0.7)
 		self.flag_timeout = 600/self.scene.frame_skip #match Roboschool
 
 	def calc_state(self):
@@ -236,14 +237,14 @@ class HumanoidFlagrunHarder(HumanoidFlagrun):
 		self.aggressive_cube = None
 		self.frame = 0
 
-	def robot_specific_reset(self):
-		HumanoidFlagrun.robot_specific_reset(self)
+	def robot_specific_reset(self, bullet_client):
+		HumanoidFlagrun.robot_specific_reset(self, bullet_client)
 
 		self.frame = 0
 		if self.aggressive_cube:
-			p.resetBasePositionAndOrientation(self.aggressive_cube.bodies[0], [-1.5,0,0.05], [0,0,0,1])
+			self._p.resetBasePositionAndOrientation(self.aggressive_cube.bodies[0], [-1.5,0,0.05], [0,0,0,1])
 		else:
-			self.aggressive_cube = ObjectHelper.get_cube(-1.5,0,0.05)
+			self.aggressive_cube = ObjectHelper.get_cube(self._p, -1.5,0,0.05)
 		self.on_ground_frame_counter = 0
 		self.crawl_start_potential = None
 		self.crawl_ignored_potential = 0.0
@@ -326,8 +327,8 @@ class Atlas(WalkerBase, URDFBasedRobot):
 		knees_at_limit = np.count_nonzero(np.abs(knees[0::2]) > 0.99)
 		return +4-knees_at_limit if z > 1.3 else -1
 
-	def robot_specific_reset(self):
-		WalkerBase.robot_specific_reset(self)
+	def robot_specific_reset(self, bullet_client):
+		WalkerBase.robot_specific_reset(self, bullet_client)
 		self.set_initial_orientation(yaw_center=0, yaw_random_spread=np.pi)
 		self.head = self.parts["head"]
 

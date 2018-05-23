@@ -1,7 +1,7 @@
-from .scenes.scene_bases import SingleRobotEmptyScene
+from pybulletgym.envs.scene_bases import SingleRobotEmptyScene
 from .env_bases import BaseBulletEnv
 import numpy as np
-from .robots.robot_manipulators import Reacher, Pusher, Striker, Thrower
+from pybulletgym.envs.robot_manipulators import Reacher, Pusher, Striker, Thrower
 
 
 class ReacherBulletEnv(BaseBulletEnv):
@@ -9,8 +9,8 @@ class ReacherBulletEnv(BaseBulletEnv):
 		self.robot = Reacher()
 		BaseBulletEnv.__init__(self, self.robot)
 
-	def create_single_player_scene(self):
-		return SingleRobotEmptyScene(gravity=0.0, timestep=0.0165, frame_skip=1)
+	def create_single_player_scene(self, bullet_client):
+		return SingleRobotEmptyScene(bullet_client, gravity=0.0, timestep=0.0165, frame_skip=1)
 
 	def _step(self, a):
 		assert (not self.scene.multiplayer)
@@ -43,8 +43,8 @@ class PusherBulletEnv(BaseBulletEnv):
 		self.robot = Pusher()
 		BaseBulletEnv.__init__(self, self.robot)
 
-	def create_single_player_scene(self):
-		return SingleRobotEmptyScene(gravity=9.81, timestep=0.0020, frame_skip=5)
+	def create_single_player_scene(self, bullet_client):
+		return SingleRobotEmptyScene(bullet_client, gravity=9.81, timestep=0.0020, frame_skip=5)
 
 	def _step(self, a):
 		self.robot.apply_action(a)
@@ -100,8 +100,8 @@ class StrikerBulletEnv(BaseBulletEnv):
 		self._min_strike_dist = np.inf
 		self.strike_threshold = 0.1
 
-	def create_single_player_scene(self):
-		return SingleRobotEmptyScene(gravity=9.81, timestep=0.0020, frame_skip=5)
+	def create_single_player_scene(self, bullet_client):
+		return SingleRobotEmptyScene(bullet_client, gravity=9.81, timestep=0.0020, frame_skip=5)
 
 	def _step(self, a):
 		self.robot.apply_action(a)
@@ -173,8 +173,8 @@ class ThrowerBulletEnv(BaseBulletEnv):
 		self.robot = Thrower()
 		BaseBulletEnv.__init__(self, self.robot)
 
-	def create_single_player_scene(self):
-		return SingleRobotEmptyScene(gravity=0.0, timestep=0.0020, frame_skip=5)
+	def create_single_player_scene(self, bullet_client):
+		return SingleRobotEmptyScene(bullet_client, gravity=0.0, timestep=0.0020, frame_skip=5)
 
 	def _step(self, a):
 		self.robot.apply_action(a)

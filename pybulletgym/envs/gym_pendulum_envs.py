@@ -1,10 +1,9 @@
-from .scenes.scene_bases import SingleRobotEmptyScene
+from pybulletgym.envs.scene_bases import SingleRobotEmptyScene
 from .env_bases import BaseBulletEnv
-from .robots.robot_pendula import InvertedPendulum, InvertedPendulumSwingup, InvertedDoublePendulum
-import gym, gym.spaces, gym.utils, gym.utils.seeding
+from pybulletgym.envs.robot_pendula import InvertedPendulum, InvertedPendulumSwingup, InvertedDoublePendulum
 import numpy as np
-import pybullet as p
-import os, sys
+import pybullet
+
 
 class InvertedPendulumBulletEnv(BaseBulletEnv):
 	def __init__(self):
@@ -12,16 +11,16 @@ class InvertedPendulumBulletEnv(BaseBulletEnv):
 		BaseBulletEnv.__init__(self, self.robot)
 		self.stateId=-1
 
-	def create_single_player_scene(self):
-		return SingleRobotEmptyScene(gravity=9.8, timestep=0.0165, frame_skip=1)
+	def create_single_player_scene(self, bullet_client):
+		return SingleRobotEmptyScene(bullet_client, gravity=9.8, timestep=0.0165, frame_skip=1)
 
 	def _reset(self):
-		if (self.stateId>=0):
+		if self.stateId >= 0:
 			#print("InvertedPendulumBulletEnv reset p.restoreState(",self.stateId,")")
-			p.restoreState(self.stateId)
+			self._p.restoreState(self.stateId)
 		r = BaseBulletEnv._reset(self)
-		if (self.stateId<0):
-			self.stateId = p.saveState()
+		if self.stateId<0:
+			self.stateId = self._p.saveState()
 			#print("InvertedPendulumBulletEnv reset self.stateId=",self.stateId)
 		return r
 
@@ -43,26 +42,29 @@ class InvertedPendulumBulletEnv(BaseBulletEnv):
 	def camera_adjust(self):
 		self.camera.move_and_look_at(0,1.2,1.0, 0,0,0.5)
 
+
 class InvertedPendulumSwingupBulletEnv(InvertedPendulumBulletEnv):
 	def __init__(self):
 		self.robot = InvertedPendulumSwingup()
 		BaseBulletEnv.__init__(self, self.robot)
 		self.stateId=-1
 
+
 class InvertedDoublePendulumBulletEnv(BaseBulletEnv):
 	def __init__(self):
 		self.robot = InvertedDoublePendulum()
 		BaseBulletEnv.__init__(self, self.robot)
 		self.stateId = -1
-	def create_single_player_scene(self):
-		return SingleRobotEmptyScene(gravity=9.8, timestep=0.0165, frame_skip=1)
+
+	def create_single_player_scene(self, bullet_client):
+		return SingleRobotEmptyScene(bullet_client, gravity=9.8, timestep=0.0165, frame_skip=1)
 
 	def _reset(self):
-		if (self.stateId>=0):
-			p.restoreState(self.stateId)
+		if self.stateId >= 0:
+			self._p.restoreState(self.stateId)
 		r = BaseBulletEnv._reset(self)
-		if (self.stateId<0):
-			self.stateId = p.saveState()
+		if self.stateId < 0:
+			self.stateId = self._p.saveState()
 		return r
 
 	def _step(self, a):
