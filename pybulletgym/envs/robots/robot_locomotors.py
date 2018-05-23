@@ -43,7 +43,7 @@ class WalkerBase(XmlBasedRobot):
 		parts_xyz[0::3].mean(), parts_xyz[1::3].mean(), body_pose.xyz()[2])  # torso z is more informative than mean z
 		self.body_rpy = body_pose.rpy()
 		z = self.body_xyz[2]
-		if self.initial_z == None:
+		if self.initial_z is None:
 			self.initial_z = z
 		r, p, yaw = self.body_rpy
 		self.walk_target_theta = np.arctan2(self.walk_target_y - self.body_xyz[1],
@@ -69,7 +69,7 @@ class WalkerBase(XmlBasedRobot):
 		# progress in potential field is speed*dt, typical speed is about 2-3 meter per second, this potential will change 2-3 per frame (not per second),
 		# all rewards have rew/frame units and close to 1.0
 		debugmode=0
-		if (debugmode):
+		if debugmode:
 			print("calc_potential: self.walk_target_dist")
 			print(self.walk_target_dist)
 			print("self.scene.dt")
@@ -144,10 +144,12 @@ class Humanoid(WalkerBase, MJCFBasedRobot):
 	self_collision = True
 	foot_list = ["right_foot", "left_foot"]  # "left_hand", "right_hand"
 
-	def __init__(self):
+	def __init__(self, random_yaw = False, random_lean=False):
 		WalkerBase.__init__(self, power=0.41)
 		MJCFBasedRobot.__init__(self, 'humanoid_symmetric.xml', 'torso', action_dim=17, obs_dim=44)
 		# 17 joints, 4 of them important for walking (hip, knee), others may as well be turned off, 17/4 = 4.25
+		self.random_yaw = random_yaw
+		self.random_lean = random_lean
 
 	def robot_specific_reset(self):
 		WalkerBase.robot_specific_reset(self)
@@ -166,9 +168,8 @@ class Humanoid(WalkerBase, MJCFBasedRobot):
 			position = [0,0,0]
 			orientation = [0,0,0]
 			yaw = self.np_random.uniform(low=-3.14, high=3.14)
-			if self.random_lean and self.np_random.randint(2)==0:
-				cpose.set_xyz(0, 0, 1.4)
-				if self.np_random.randint(2)==0:
+			if self.random_lean and self.np_random.randint(2) == 0:
+				if self.np_random.randint(2) == 0:
 					pitch = np.pi/2
 					position = [0, 0, 0.45]
 				else:
@@ -180,11 +181,8 @@ class Humanoid(WalkerBase, MJCFBasedRobot):
 				position = [0, 0, 1.4]
 				orientation = [0, 0, yaw]  # just face random direction, but stay straight otherwise
 			self.robot_body.reset_position(position)
-			self.robot_body.reset_orientation(orientation)
+			self.robot_body.reset_orientation(p.getQuaternionFromEuler(orientation))
 		self.initial_z = 0.8
-
-	random_yaw = False
-	random_lean = False
 
 	def apply_action(self, a):
 		assert( np.isfinite(a).all() )
@@ -195,24 +193,6 @@ class Humanoid(WalkerBase, MJCFBasedRobot):
 	def alive_bonus(self, z, pitch):
 		return +2 if z > 0.78 else -1   # 2 here because 17 joints produce a lot of electricity cost just from policy noise, living must be better than dying
 
-
-
-
-def get_cube(x, y, z):
-	body = p.loadURDF(os.path.join(pybullet_data.getDataPath(),"cube_small.urdf"), x, y, z)
-	p.changeDynamics(body,-1, mass=1.2)#match Roboschool
-	part_name, _ = p.getBodyInfo(body, 0)
-	part_name = part_name.decode("utf8")
-	bodies = [body]
-	return BodyPart(part_name, bodies, 0, -1)
-
-
-def get_sphere(x, y, z):
-	body = p.loadURDF(os.path.join(pybullet_data.getDataPath(),"sphere2red_nocol.urdf"), x, y, z)
-	part_name, _ = p.getBodyInfo(body, 0)
-	part_name = part_name.decode("utf8")
-	bodies = [body]
-	return BodyPart(part_name, bodies, 0, -1)
 
 class HumanoidFlagrun(Humanoid):
 	def __init__(self):
@@ -230,13 +210,13 @@ class HumanoidFlagrun(Humanoid):
 		self.walk_target_x *= more_compact
 		self.walk_target_y *= more_compact
 
-		if (self.flag):
+		if self.flag:
 			#for b in self.flag.bodies:
 			#	print("remove body uid",b)
 			#	p.removeBody(b)
-			p.resetBasePositionAndOrientation(self.flag.bodies[0],[self.walk_target_x, self.walk_target_y, 0.7],[0,0,0,1])
+			p.resetBasePositionAndOrientation(self.flag.bodies[0],[self.walk_target_x, self.walk_target_y, 0.7], [0,0,0,1])
 		else:
-			self.flag = get_sphere(self.walk_target_x, self.walk_target_y, 0.7)
+			self.flag = ObjectHelper.get_sphere(self.walk_target_x, self.walk_target_y, 0.7)
 		self.flag_timeout = 600/self.scene.frame_skip #match Roboschool
 
 	def calc_state(self):
@@ -260,10 +240,10 @@ class HumanoidFlagrunHarder(HumanoidFlagrun):
 		HumanoidFlagrun.robot_specific_reset(self)
 
 		self.frame = 0
-		if (self.aggressive_cube):
-			p.resetBasePositionAndOrientation(self.aggressive_cube.bodies[0],[-1.5,0,0.05],[0,0,0,1])
+		if self.aggressive_cube:
+			p.resetBasePositionAndOrientation(self.aggressive_cube.bodies[0], [-1.5,0,0.05], [0,0,0,1])
 		else:
-			self.aggressive_cube = get_cube(-1.5,0,0.05)
+			self.aggressive_cube = ObjectHelper.get_cube(-1.5,0,0.05)
 		self.on_ground_frame_counter = 0
 		self.crawl_start_potential = None
 		self.crawl_ignored_potential = 0.0
@@ -279,8 +259,8 @@ class HumanoidFlagrunHarder(HumanoidFlagrun):
 			time_to_travel = from_dist / attack_speed
 			target_xyz += robot_speed*time_to_travel  # predict future position at the moment the cube hits the robot
 			position = [target_xyz[0] + from_dist*np.cos(angle),
-				target_xyz[1] + from_dist*np.sin(angle),
-				target_xyz[2] + 1.0]
+						target_xyz[1] + from_dist*np.sin(angle),
+						target_xyz[2] + 1.0]
 			attack_speed_vector = target_xyz - np.array(position)
 			attack_speed_vector *= attack_speed / np.linalg.norm(attack_speed_vector)
 			attack_speed_vector += self.np_random.uniform(low=-1.0, high=+1.0, size=(3,))
@@ -327,6 +307,7 @@ class HumanoidFlagrunHarder(HumanoidFlagrun):
 class Atlas(WalkerBase, URDFBasedRobot):
 	random_yaw = False
 	foot_list = ["r_foot", "l_foot"]
+
 	def __init__(self):
 		WalkerBase.__init__(self, power=2.9)
 		URDFBasedRobot.__init__(self, "atlas/atlas_description/atlas_v4_with_multisense.urdf", "pelvis", action_dim=30, obs_dim=70)

@@ -42,19 +42,23 @@ class BaseBulletEnv(gym.Env):
 		return [seed]
 
 	def _reset(self):
-		if (self.physicsClientId<0):
+		if self.physicsClientId<0:
 			conInfo = p.getConnectionInfo()
-			if (conInfo['isConnected']):
+			if conInfo['isConnected']:
 				self.ownsPhysicsClient = False
 
 				self.physicsClientId = 0
+				print("Another instance own the physics client.")
 			else:
 				self.ownsPhysicsClient = True
+				print("Trying to connect via shared memory....")
 				self.physicsClientId = p.connect(p.SHARED_MEMORY)
-				if (self.physicsClientId<0):
-					if (self.isRender):
+				if self.physicsClientId < 0:
+					if self.isRender:
+						print("Trying to connect via GUI....")
 						self.physicsClientId = p.connect(p.GUI)
 					else:
+						print("Trying to connect headless...")
 						self.physicsClientId = p.connect(p.DIRECT)
 				p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
 
@@ -74,14 +78,14 @@ class BaseBulletEnv(gym.Env):
 		return s
 
 	def _render(self, mode, close=False):
-		if (mode=="human"):
+		if mode == "human":
 			self.isRender = True
 		if mode != "rgb_array":
 			return np.array([])
 
-		base_pos=[0,0,0]
-		if (hasattr(self,'robot')):
-			if (hasattr(self.robot,'body_xyz')):
+		base_pos = [0,0,0]
+		if hasattr(self,'robot'):
+			if hasattr(self.robot,'body_xyz'):
 				base_pos = self.robot.body_xyz
 
 		view_matrix = p.computeViewMatrixFromYawPitchRoll(
@@ -95,7 +99,9 @@ class BaseBulletEnv(gym.Env):
 			fov=60, aspect=float(self._render_width)/self._render_height,
 			nearVal=0.1, farVal=100.0)
 		(_, _, px, _, _) = p.getCameraImage(
-		width=self._render_width, height=self._render_height, viewMatrix=view_matrix,
+			width=self._render_width,
+			height=self._render_height,
+			viewMatrix=view_matrix,
 			projectionMatrix=proj_matrix,
 			renderer=p.ER_BULLET_HARDWARE_OPENGL
 			)
@@ -103,10 +109,9 @@ class BaseBulletEnv(gym.Env):
 		rgb_array = rgb_array[:, :, :3]
 		return rgb_array
 
-
 	def _close(self):
-		if (self.ownsPhysicsClient):
-			if (self.physicsClientId>=0):
+		if self.ownsPhysicsClient:
+			if self.physicsClientId >= 0:
 				p.disconnect(self.physicsClientId)
 		self.physicsClientId = -1
 

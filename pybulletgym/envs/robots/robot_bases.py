@@ -85,15 +85,11 @@ class XmlBasedRobot:
 
 					joints[joint_name].power_coef = 100.0
 
-				# TODO: Maybe we need this
-				# joints[joint_name].power_coef, joints[joint_name].max_velocity = joints[joint_name].limits()[2:4]
-				# self.ordered_joints.append(joints[joint_name])
-				# self.jdict[joint_name] = joints[joint_name]
-
 		return parts, joints, ordered_joints, self.robot_body
 
 	def reset_pose(self, position, orientation):
 		self.parts[self.robot_name].reset_pose(position, orientation)
+
 
 class MJCFBasedRobot(XmlBasedRobot):
 	"""
@@ -244,6 +240,9 @@ class BodyPart:
 	def current_orientation(self):
 		return self.get_pose()[3:]
 
+	def get_position(self):
+		return self.current_position()
+
 	def get_orientation(self):
 		return self.current_orientation()
 
@@ -253,7 +252,7 @@ class BodyPart:
 	def reset_orientation(self, orientation):
 		p.resetBasePositionAndOrientation(self.bodies[self.bodyIndex], self.get_position(), orientation)
 
-	def reset_velocity(self, linearVelocity=[0,0,0], angularVelocity =[0,0,0]):
+	def reset_velocity(self, linearVelocity = [0,0,0], angularVelocity = [0,0,0]):
 		p.resetBaseVelocity(self.bodies[self.bodyIndex], linearVelocity, angularVelocity)
 
 	def reset_pose(self, position, orientation):

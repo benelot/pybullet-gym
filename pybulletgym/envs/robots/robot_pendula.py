@@ -4,7 +4,7 @@ import numpy as np
 class InvertedPendulum(MJCFBasedRobot):
 	swingup = False
 	def __init__(self):
-		MJCFBasedRobot.__init__(self, 'inverted_pendulum.xml', 'cart', action_dim=1, obs_dim=5)
+		MJCFBasedRobot.__init__(self, 'inverted_pendulum.xml', 'cart', action_dim=1, obs_dim=4)
 
 	def robot_specific_reset(self):
 		self.pole = self.parts["pole"]
@@ -43,8 +43,7 @@ class InvertedPendulum(MJCFBasedRobot):
 			theta_dot = 0
 
 		return np.array([
-			x, vx,
-			np.cos(self.theta), np.sin(self.theta), theta_dot
+			x, self.theta, vx, theta_dot
 			])
 
 class InvertedPendulumSwingup(InvertedPendulum):
