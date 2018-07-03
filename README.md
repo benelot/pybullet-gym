@@ -10,21 +10,21 @@ OpenAI gym is currently one of the most widely used toolkit for developing and c
 Environment Name | Implemented | Similar to Reference Implementation | Pretrained agent available
 ---------|---------|---------|---------
 | **RoboSchool Envs** |
-InvertedPendulumPyBulletEnv-v0      | No | No | No
-InvertedDoublePendulumPyBulletEnv-v0      | No | No | No
-InvertedPendulumSwingupPyBulletEnv-v0      | No | No | No
-ReacherPyBulletEnv-v0      | No | No | No
-Walker2DPyBulletEnv-v0      | No | No | No
-HalfCheetahPyBulletEnv-v0      | No | No | No
-AntPyBulletEnv-v0      | No | No | No
-HopperPyBulletEnv-v0      | No | No | No
-HumanoidPyBulletEnv-v0      | No | No | No
-HumanoidFlagrunPyBulletEnv-v0      | No | No | No
-HumanoidFlagrunHarderPyBulletEnv-v0      | No | No | No
-AtlasPyBulletEnv-v0      | No | No | No
-PusherPyBulletEnv-v0      | No | No | No
-ThrowerPyBulletEnv-v0      | No | No | No
-StrikerPyBulletEnv-v0      | No | No | No
+InvertedPendulumPyBulletEnv-v0      | Yes | Yes | No
+InvertedDoublePendulumPyBulletEnv-v0      | Yes | Yes | No
+InvertedPendulumSwingupPyBulletEnv-v0      | Yes | Yes | No
+ReacherPyBulletEnv-v0      | Yes | Yes | No
+Walker2DPyBulletEnv-v0      | Yes | Yes | No
+HalfCheetahPyBulletEnv-v0      | Yes | Yes | No
+AntPyBulletEnv-v0      | Yes | Yes | No
+HopperPyBulletEnv-v0      | Yes | Yes | No
+HumanoidPyBulletEnv-v0      | Yes | Yes | No
+HumanoidFlagrunPyBulletEnv-v0      | Yes | Yes | No
+HumanoidFlagrunHarderPyBulletEnv-v0      | Yes | Yes | No
+AtlasPyBulletEnv-v0      | Yes | No | No
+PusherPyBulletEnv-v0      | Yes | No | No
+ThrowerPyBulletEnv-v0      | Yes | No | No
+StrikerPyBulletEnv-v0      | Yes | No | No
 | **MuJoCo Envs** |
 InvertedPendulumMuJoCoEnv-v0      | No | No | No
 InvertedDoublePendulumMuJoCoEnv-v0      | No | No | No
