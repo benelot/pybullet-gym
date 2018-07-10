@@ -1,4 +1,4 @@
-from pybulletgym.envs.robot_bases import BodyPart
+from pybulletgym.envs.roboschool.robot_bases import BodyPart
 import os, inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)

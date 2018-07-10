@@ -1,8 +1,8 @@
-from pybulletgym.envs.scene_stadium import StadiumScene
+from pybulletgym.envs.roboschool.scene_stadium import StadiumScene
 from .env_bases import BaseBulletEnv
 import numpy as np
 import pybullet
-from pybulletgym.envs.robot_locomotors import Hopper, Walker2D, HalfCheetah, Ant, Humanoid, HumanoidFlagrun, HumanoidFlagrunHarder, Atlas
+from pybulletgym.envs.roboschool.robot_locomotors import Hopper, Walker2D, HalfCheetah, Ant, Humanoid, HumanoidFlagrun, HumanoidFlagrunHarder, Atlas
 
 
 class WalkerBaseBulletEnv(BaseBulletEnv):

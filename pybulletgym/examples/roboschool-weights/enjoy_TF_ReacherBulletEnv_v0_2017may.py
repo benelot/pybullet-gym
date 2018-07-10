@@ -9,8 +9,10 @@ import numpy as np
 import pybulletgym.envs
 import time
 
+
 def relu(x):
     return np.maximum(x, 0)
+
 
 class SmallReactivePolicy:
     "Simple multi-layer perceptron policy, no internal state"
@@ -19,12 +21,14 @@ class SmallReactivePolicy:
         assert weights_dense2_w.shape == (128, 64)
         assert weights_final_w.shape  == (64, action_space.shape[0])
 
-    def act(self, ob):
+    @staticmethod
+    def act(ob):
         x = ob
         x = relu(np.dot(x, weights_dense1_w) + weights_dense1_b)
         x = relu(np.dot(x, weights_dense2_w) + weights_dense2_b)
         x = np.dot(x, weights_final_w) + weights_final_b
         return x
+
 
 def main():
     env = gym.make("ReacherPyBulletEnv-v0")
@@ -44,15 +48,16 @@ def main():
             score += r
             frame += 1
             still_open = env.render("human")
-            if still_open==False:
+            if not still_open:
                 return
             if not done: continue
-            if restart_delay==0:
+            if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
                 restart_delay = 60*2  # 2 sec at 60 fps
             else:
                 restart_delay -= 1
-                if restart_delay==0: break
+                if restart_delay == 0:
+                    break
 
 weights_dense1_w = np.array([
 [ +0.4244, +0.9150, +0.4075, -0.3415, +0.2841, +1.2984, -1.1950, +0.3478, -0.2900, -0.5474, -0.6919, -0.0781, -0.3051, -0.1247, -1.2280, +1.3602, +0.5159, -0.0384, +0.9156, +0.7306, +0.7552, -1.2306, +0.5731, +1.0769, -1.4851, -0.5160, -0.1528, -1.1702, -0.9395, -0.2198, +1.0057, +0.4758, -0.3467, -0.7215, +0.0270, -0.1783, +0.5018, -0.0374, +0.3162, -0.7540, -0.7853, +0.3160, -0.5434, +1.0894, +0.0252, -0.5503, -0.6377, -0.5087, -1.3066, -0.0181, +0.1280, -0.5365, +0.1945, +0.6695, +0.4415, -0.5713, +0.5592, +0.0113, +0.2797, -0.4546, +0.6477, -0.4467, -0.1189, +0.3242, +0.8866, -0.0667, +0.7124, -0.2570, -0.3260, +1.0482, -0.1004, +1.2418, -0.5713, +0.2118, +0.6877, +0.4365, +0.6648, -0.4594, -0.2603, +0.8333, -0.5834, -0.5376, -0.2444, -0.4736, -0.3648, +0.6698, -0.6180, -0.1128, -0.2978, +0.5107, -0.0221, -0.0113, -0.5551, +0.2489, +0.1407, -1.5845, +0.8667, -0.0565, -0.6969, -0.5912, +0.1687, +0.3143, -0.5432, -0.1897, +0.2881, +0.1026, -0.7445, -0.0120, -0.7738, -0.9807, -0.7489, -0.7462, -0.1743, -0.4479, +0.8495, -0.6832, -0.3081, +0.7694, -0.1342, -0.3655, +0.1726, +0.0730, -0.8439, -0.7802, +0.7100, -0.4464, -0.0556, -0.7924],
@@ -270,5 +275,5 @@ weights_final_w = np.array([
 
 weights_final_b = np.array([ -0.1082, -0.0330])
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

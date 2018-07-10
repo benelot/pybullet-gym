@@ -105,7 +105,7 @@ class MJCFBasedRobot(XmlBasedRobot):
 		self.doneLoading=0
 	def reset(self, bullet_client):
 
-		full_path = os.path.join(os.path.dirname(__file__), "assets", "mjcf", self.model_xml)
+		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "mjcf", self.model_xml)
 
 		self._p = bullet_client
 		print("Created bullet_client with id=", self._p._client)
@@ -124,7 +124,8 @@ class MJCFBasedRobot(XmlBasedRobot):
 
 		return s
 
-	def calc_potential(self):
+	@staticmethod
+	def calc_potential():
 		return 0
 
 
@@ -145,7 +146,7 @@ class URDFBasedRobot(XmlBasedRobot):
 		self._p = bullet_client
 		self.ordered_joints = []
 
-		full_path = os.path.join(os.path.dirname(__file__), "assets", "robots", self.model_urdf)
+		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "robots", self.model_urdf)
 		print(full_path)
 
 		if self.self_collision:
@@ -169,7 +170,8 @@ class URDFBasedRobot(XmlBasedRobot):
 
 		return s
 
-	def calc_potential(self):
+	@staticmethod
+	def calc_potential():
 		return 0
 
 
@@ -199,11 +201,12 @@ class SDFBasedRobot(XmlBasedRobot):
 
 		return s
 
-	def calc_potential(self):
+	@staticmethod
+	def calc_potential():
 		return 0
 
 
-class Pose_Helper: # dummy class to comply to original interface
+class PoseHelper: # dummy class to comply to original interface
 	def __init__(self, body_part):
 		self.body_part = body_part
 
@@ -216,6 +219,7 @@ class Pose_Helper: # dummy class to comply to original interface
 	def orientation(self):
 		return self.body_part.current_orientation()
 
+
 class BodyPart:
 	def __init__(self, bullet_client, body_name, bodies, bodyIndex, bodyPartIndex):
 		self.bodies = bodies
@@ -224,7 +228,7 @@ class BodyPart:
 		self.bodyPartIndex = bodyPartIndex
 		self.initialPosition = self.current_position()
 		self.initialOrientation = self.current_orientation()
-		self.bp_pose = Pose_Helper(self)
+		self.bp_pose = PoseHelper(self)
 
 	def state_fields_of_pose_of(self, body_id, link_id=-1):  # a method you will most probably need a lot to get pose and orientation
 		if link_id == -1:
@@ -335,7 +339,7 @@ class Joint:
 	def set_velocity(self, velocity):
 		self._p.setJointMotorControl2(self.bodies[self.bodyIndex],self.jointIndex,pybullet.VELOCITY_CONTROL, targetVelocity=velocity)
 
-	def set_motor_torque(self, torque): # just some synonym method
+	def set_motor_torque(self, torque):  # just some synonym method
 		self.set_torque(torque)
 
 	def set_torque(self, torque):

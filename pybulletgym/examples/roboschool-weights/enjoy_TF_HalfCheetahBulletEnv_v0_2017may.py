@@ -10,8 +10,10 @@ import pybullet as p
 import pybulletgym.envs
 import time
 
+
 def relu(x):
     return np.maximum(x, 0)
+
 
 class SmallReactivePolicy:
     "Simple multi-layer perceptron policy, no internal state"
@@ -20,12 +22,14 @@ class SmallReactivePolicy:
         assert weights_dense2_w.shape == (128, 64)
         assert weights_final_w.shape  == (64, action_space.shape[0])
 
-    def act(self, ob):
+    @staticmethod
+    def act(ob):
         x = ob
         x = relu(np.dot(x, weights_dense1_w) + weights_dense1_b)
         x = relu(np.dot(x, weights_dense2_w) + weights_dense2_b)
         x = np.dot(x, weights_final_w) + weights_final_b
         return x
+
 
 def main():
     env = gym.make("HalfCheetahPyBulletEnv-v0")
@@ -36,12 +40,12 @@ def main():
     torsoId = -1
     for i in range (p.getNumBodies()):
         print(p.getBodyInfo(i))
-        if (p.getBodyInfo(i)[1].decode() == "cheetah"):
-           torsoId=i
+        if p.getBodyInfo(i)[1].decode() == "cheetah":
+           torsoId = i
            print("found torso")
            print(p.getNumJoints(torsoId))
            for j in range (p.getNumJoints(torsoId)):
-              print(p.getJointInfo(torsoId,j))#LinkState(torsoId,j))
+              print(p.getJointInfo(torsoId,j))  # LinkState(torsoId,j))
 
     while 1:
         frame = 0
@@ -55,20 +59,21 @@ def main():
             obs, r, done, _ = env.step(a)
             score += r
             frame += 1
-            distance=5
+            distance = 5
             yaw = 0
             humanPos = p.getLinkState(torsoId,4)[0]
-            p.resetDebugVisualizerCamera(distance,yaw,-20,humanPos);
+            p.resetDebugVisualizerCamera(distance,yaw,-20,humanPos)
             still_open = env.render("human")
-            if still_open==False:
+            if not still_open:
                 return
             if not done: continue
-            if restart_delay==0:
+            if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
                 restart_delay = 60*2  # 2 sec at 60 fps
             else:
                 restart_delay -= 1
-                if restart_delay==0: break
+                if restart_delay == 0:
+                    break
 
 weights_dense1_w = np.array([
 [ -0.4105, +0.5540, +0.2791, +0.4953, -0.0309, +0.8480, +0.1630, +0.0630, +0.7107, +0.0597, +0.2675, -0.1931, -0.2436, +0.2909, +0.3563, +0.4564, -0.0445, -0.2228, +0.7005, +0.8368, +0.3631, +0.7365, +0.2453, +0.4687, +0.4819, +0.4940, +0.5096, +0.5929, +0.5504, +0.2265, +0.4118, +0.5993, +0.2402, -0.5087, -0.0756, +0.7520, -0.0086, -0.0648, +0.0564, -0.0812, -0.0093, +0.8482, +0.7333, +0.4401, -0.1273, -0.2974, +0.1284, -0.4948, +0.1120, +0.7938, +0.1297, +1.0807, +0.2480, +0.2444, +0.4258, +0.1515, -0.0126, +0.3098, -0.2786, +0.4913, +0.3065, +0.3356, +0.6884, +0.3117, +0.3163, +0.4234, +0.1172, +0.8810, +0.3574, -0.3993, -0.5597, +0.2233, +0.8058, +0.3391, -0.1113, +0.1884, +0.1324, +0.0503, +0.1807, +0.0441, -0.2065, +0.1978, +0.0852, -0.3531, +0.2180, +0.7946, -0.0318, +0.0650, -0.3174, -0.1715, -0.0486, +0.2131, -0.3901, +0.1995, +0.8593, +0.1786, +0.3595, +0.7852, +0.3491, -0.4206, +0.6117, -0.1991, +0.1876, -0.3114, -0.2007, -0.2738, -0.0388, +0.0465, +0.2726, -0.5321, +0.4720, -0.0555, +0.3415, +0.1447, -0.1132, -0.2958, -0.6729, -0.5003, -0.4960, -0.2600, -0.4158, -0.4476, -0.8244, -0.0574, +0.2194, +0.0541, -0.3526, -0.1131],

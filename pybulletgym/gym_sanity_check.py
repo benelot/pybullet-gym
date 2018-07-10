@@ -1,6 +1,5 @@
 import gym
 import numpy as np
-import pybulletgym.envs
 import traceback
 envs = [spec.id for spec in gym.envs.registry.all() if spec.id.find('PyBullet') >= 0]
 bugged_envs = []

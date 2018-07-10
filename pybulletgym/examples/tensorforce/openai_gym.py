@@ -27,18 +27,30 @@ import logging
 import os
 import time
 
+import pybulletgym.envs
 from tensorforce import TensorForceError
 from tensorforce.agents import Agent
 from tensorforce.execution import Runner
 from tensorforce.contrib.openai_gym import OpenAIGym
-import pybulletgym.envs
-import pybullet as p
+
 
 # Examples (train)
-# python ./openai_gym.py InvertedPendulumPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/invpendulumv0-ckpts/invpdv0 -D --visualize
+# python ./openai_gym.py InvertedPendulumPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/invpendulumv0-ckpts/invpdv0 -D
+# python ./openai_gym.py InvertedDoublePendulumPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/invdpendulumv0-ckpts/invdpdv0 -D
+# python ./openai_gym.py ReacherPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/reacherv0-ckpts/reacherv0 -D
+# python ./openai_gym.py AntPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/antv0-ckpts/antv0 -D
+# python ./openai_gym.py HalfCheetahPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/hcheetahv0-ckpts/hcheetahv0 -D
+# python ./openai_gym.py HumanoidPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/humanoidv0-ckpts/humanoidv0 -D
+# python ./openai_gym.py PusherPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/pusherv0-ckpts/pusherv0 -D
 
 # Examples (test)
 # python ./openai_gym.py InvertedPendulumPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/invpendulumv0-ckpts/ -D --test --visualize
+# python ./openai_gym.py InvertedDoublePendulumPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/invdpendulumv0-ckpts/ -D --test --visualize
+# python ./openai_gym.py ReacherPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/reacherv0-ckpts/ -D --test --visualize
+# python ./openai_gym.py AntPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/antv0-ckpts/ -D --test --visualize
+# python ./openai_gym.py HalfCheetahPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/hcheetahv0-ckpts/ -D --test --visualize
+# python ./openai_gym.py HumanoidPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/humanoidv0-ckpts/ -D --test --visualize
+# python ./openai_gym.py PusherPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/pusherv0-ckpts/ -D --test --visualize
 
 # For detailed explanations about the options, check the arguments implementation below or on the tensorforce main repository: https://github.com/reinforceio/tensorforce
 
@@ -71,11 +83,6 @@ def main():
     logger = logging.getLogger(__file__)
     logger.setLevel(logging.INFO)
 
-    # initialize physics server for visualization
-    physicsClientId = -1
-    if args.visualize:
-        physicsClientId = p.connect(p.GUI)
-
     environment = OpenAIGym(
         gym_id=args.gym_id,
         monitor=args.monitor,
@@ -83,6 +90,10 @@ def main():
         monitor_video=args.monitor_video,
         visualize=args.visualize
     )
+
+    # initialize visualization
+    if args.visualize:
+        environment.gym.render(mode="human") # HACK to get the visualizer started
 
     if args.agent is not None:
         with open(args.agent, 'r') as fp:
@@ -177,11 +188,6 @@ def main():
         testing=args.test
     )
     runner.close()
-
-    # close visualization 
-    if physicsClientId >= 0:
-        p.disconnect(self.physicsClientId)
-    physicsClientId = -1
 
     logger.info("Learning finished. Total episodes: {ep}".format(ep=runner.agent.episode))
 

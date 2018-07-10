@@ -11,8 +11,10 @@ import pybullet as p
 import pybulletgym.envs
 import time
 
+
 def relu(x):
     return np.maximum(x, 0)
+
 
 class SmallReactivePolicy:
     "Simple multi-layer perceptron policy, no internal state"
@@ -21,12 +23,14 @@ class SmallReactivePolicy:
         assert weights_dense2_w.shape == (128, 64)
         assert weights_final_w.shape  == (64, action_space.shape[0])
 
-    def act(self, ob):
+    @staticmethod
+    def act(ob):
         x = ob
         x = relu(np.dot(x, weights_dense1_w) + weights_dense1_b)
         x = relu(np.dot(x, weights_dense2_w) + weights_dense2_b)
         x = np.dot(x, weights_final_w) + weights_final_b
         return x
+
 
 def main():
     env = gym.make("AtlasPyBulletEnv-v0")
@@ -35,10 +39,10 @@ def main():
 
     env.reset()
     torsoId = -1
-    for i in range (p.getNumBodies()):
+    for i in range(p.getNumBodies()):
         print(p.getBodyInfo(i))
-        if (p.getBodyInfo(i)[0].decode("utf8") == "pelvis"):
-           torsoId=i
+        if p.getBodyInfo(i)[0].decode("utf8") == "pelvis":
+           torsoId = i
            print("found pelvis")
 
     while 1:
@@ -56,18 +60,19 @@ def main():
             distance=5
             yaw = 0
             humanPos, humanOrn = p.getBasePositionAndOrientation(torsoId)
-            p.resetDebugVisualizerCamera(distance,yaw,-20,humanPos);
+            p.resetDebugVisualizerCamera(distance, yaw, -20, humanPos)
 
             still_open = env.render("human")
-            if still_open==False:
+            if not still_open:
                 return
             if not done: continue
-            if restart_delay==0:
+            if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
                 restart_delay = 60*2  # 2 sec at 60 fps
             else:
                 restart_delay -= 1
-                if restart_delay==0: break
+                if restart_delay == 0:
+                    break
 
 weights_dense1_w = np.array([
 [ +0.2220, +0.1193, +0.0508, +0.0148, -0.3239, +0.1804, -0.0173, +0.0100, +0.1167, +0.2312, -0.1030, +0.0977, -0.0548, +0.1067, +0.0883, +0.0777, +0.0142, +0.0046, +0.0557, -0.2344, +0.2857, +0.1997, -0.0620, -0.0783, -0.2340, +0.6687, +0.4405, +0.0764, +0.0060, -0.0327, -0.0962, +0.2507, -0.1791, +0.2677, -0.0315, +0.2340, -0.1229, -0.2647, -0.0457, +0.1305, -0.2001, +0.2034, +0.4743, -0.0882, +0.3731, -0.0947, -0.2649, -0.1562, +0.0286, +0.3395, +0.0718, +0.2465, +0.0229, -0.2573, -0.1256, -0.2517, +0.3399, +0.0512, -0.1497, +0.2791, -0.0974, -0.0500, +0.1467, +0.0492, +0.0634, +0.2575, -0.0893, -0.1554, -0.1654, +0.1207, -0.1295, -0.0498, -0.0868, +0.3209, -0.0962, +0.2105, -0.1886, +0.0186, -0.0907, -0.0788, +0.1909, -0.2528, +0.1995, +0.0508, -0.1658, -0.2081, -0.0914, +0.1710, +0.3531, +0.2539, +0.0633, +0.1606, +0.2998, -0.0562, +0.1561, -0.0242, +0.0987, -0.4196, +0.1680, -0.1218, +0.0056, +0.3523, +0.1682, -0.0388, +0.0245, +0.1067, -0.3154, +0.2121, -0.4010, -0.0312, -0.1111, -0.1210, +0.1616, -0.0470, +0.3795, +0.1158, -0.2401, +0.3634, +0.3164, -0.0770, +0.1690, +0.3492, +0.2852, -0.0271, +0.0844, -0.0239, -0.2552, -0.0586],

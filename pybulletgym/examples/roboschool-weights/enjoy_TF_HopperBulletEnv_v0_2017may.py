@@ -10,8 +10,10 @@ import pybullet as p
 import pybulletgym.envs
 import time
 
+
 def relu(x):
     return np.maximum(x, 0)
+
 
 class SmallReactivePolicy:
     "Simple multi-layer perceptron policy, no internal state"
@@ -20,7 +22,8 @@ class SmallReactivePolicy:
         assert weights_dense2_w.shape == (128, 64)
         assert weights_final_w.shape  == (64, action_space.shape[0])
 
-    def act(self, ob):
+    @staticmethod
+    def act(ob):
         x = ob
         x = relu(np.dot(x, weights_dense1_w) + weights_dense1_b)
         x = relu(np.dot(x, weights_dense2_w) + weights_dense2_b)
@@ -35,12 +38,12 @@ def main():
     env.reset()
     for i in range (p.getNumBodies()):
         print(p.getBodyInfo(i))
-        if (p.getBodyInfo(i)[1].decode() == "hopper"):
-           torsoId=i
+        if p.getBodyInfo(i)[1].decode() == "hopper":
+           torsoId = i
            print("found torso")
            print(p.getNumJoints(torsoId))
            for j in range (p.getNumJoints(torsoId)):
-              print(p.getJointInfo(torsoId,j))#LinkState(torsoId,j))
+              print(p.getJointInfo(torsoId,j))  # LinkState(torsoId,j))
     while 1:
         frame = 0
         score = 0
@@ -54,21 +57,22 @@ def main():
             obs, r, done, _ = env.step(a)
             score += r
             frame += 1
-            distance=5
+            distance = 5
             yaw = 0
             humanPos = p.getLinkState(torsoId,4)[0]
-            p.resetDebugVisualizerCamera(distance,yaw,-20,humanPos);
+            p.resetDebugVisualizerCamera(distance, yaw, -20, humanPos)
 
             still_open = env.render("human")
-            if still_open==False:
+            if not still_open:
                 return
             if not done: continue
-            if restart_delay==0:
+            if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
                 restart_delay = 60*2  # 2 sec at 60 fps
             else:
                 restart_delay -= 1
-                if restart_delay==0: break
+                if restart_delay == 0:
+                    break
 
 weights_dense1_w = np.array([
 [ +0.6734, +1.1364, +0.6117, +0.5185, +0.5099, -0.2038, -0.0045, -0.1448, +0.5081, +1.1685, -0.7904, -0.4623, +0.0027, -0.0473, -0.1144, +0.5095, -0.1913, +0.2021, +0.3485, +0.1104, -0.4992, +0.5207, -0.1013, -0.6947, +0.1624, +0.3533, -0.2485, -0.0012, +0.1674, +0.1253, +1.5485, +0.3576, +0.8236, +0.7361, +0.6604, -0.0834, +0.1212, -0.8404, -0.8337, +0.3709, -0.4218, -0.1011, -1.1418, -0.0554, +0.6676, +0.4739, -0.2105, +0.3187, -0.4321, -0.7018, +0.1845, +0.2525, +0.0205, +0.9391, +0.6123, +0.6868, +0.5116, +0.3483, +0.1148, +0.6747, -0.1590, +0.1879, +0.4836, +0.1997, +0.5105, -0.2695, +0.0645, +0.5566, +0.0502, +0.2292, -0.4234, -0.3778, -0.7639, -0.6084, -0.0375, -0.4799, +0.6465, -0.4097, +0.1091, -0.0681, -0.1813, +0.3625, +0.6067, +0.1837, +0.1600, -0.1706, +0.0531, -0.3710, +0.1320, +0.5035, +0.1106, +0.9955, -0.2657, +0.6051, -0.2525, -0.9118, -0.6031, +0.2025, -0.2774, +0.3985, -0.0809, +0.3601, -0.0410, -0.5067, +0.4987, +0.4126, -0.1393, -0.6596, +0.8182, -0.2352, -0.9337, +0.1438, +0.3871, -0.1844, -0.4010, -0.3338, +0.1597, +0.2381, -0.4403, +0.5105, +1.0354, -0.1503, +0.2731, +0.6555, +0.2048, +0.4932, -0.0067, +0.0413],
@@ -292,5 +296,5 @@ weights_final_w = np.array([
 
 weights_final_b = np.array([ +0.4868, -0.0987, -0.0946])
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

@@ -7,32 +7,35 @@ os.sys.path.insert(0,parentdir)
 import gym
 import numpy as np
 import pybullet as p
-import pybullet_envs
+import pybulletgym.envs
 import os.path
 import time
 
+
 def relu(x):
-                return np.maximum(x, 0)
+    return np.maximum(x, 0)
+
 
 class SmallReactivePolicy:
-                "Simple multi-layer perceptron policy, no internal state"
-                def __init__(self, observation_space, action_space):
-                                assert weights_dense1_w.shape == (observation_space.shape[0], 256)
-                                assert weights_dense2_w.shape == (256, 128)
-                                assert weights_final_w.shape  == (128, action_space.shape[0])
+    "Simple multi-layer perceptron policy, no internal state"
+    def __init__(self, observation_space, action_space):
+        assert weights_dense1_w.shape == (observation_space.shape[0], 256)
+        assert weights_dense2_w.shape == (256, 128)
+        assert weights_final_w.shape  == (128, action_space.shape[0])
 
-                def act(self, ob):
-                                x = ob
-                                x = relu(np.dot(x, weights_dense1_w) + weights_dense1_b)
-                                x = relu(np.dot(x, weights_dense2_w) + weights_dense2_b)
-                                x = np.dot(x, weights_final_w) + weights_final_b
-                                return x
+    @staticmethod
+    def act(ob):
+        x = ob
+        x = relu(np.dot(x, weights_dense1_w) + weights_dense1_b)
+        x = relu(np.dot(x, weights_dense2_w) + weights_dense2_b)
+        x = np.dot(x, weights_final_w) + weights_final_b
+        return x
 
 
 def demo_run():
     gui = True
-    env = gym.make("HumanoidFlagrunHarderBulletEnv-v0")
-    if (gui):
+    env = gym.make("HumanoidFlagrunHarderPyBulletEnv-v0")
+    if gui:
       env.render(mode="human")
 
     pi = SmallReactivePolicy(env.observation_space, env.action_space)
@@ -44,7 +47,7 @@ def demo_run():
         torsoId = -1
         for i in range (p.getNumBodies()):
           print(p.getBodyInfo(i))
-          if (p.getBodyInfo(i)[0].decode() == "torso"):
+          if p.getBodyInfo(i)[0].decode() == "torso":
             torsoId=i
             print("found humanoid torso")
 
@@ -62,20 +65,23 @@ def demo_run():
               yaw = camInfo[8]
               pitch=camInfo[9]
               targetPos = [0.95*curTargetPos[0]+0.05*humanPos[0],0.95*curTargetPos[1]+0.05*humanPos[1],curTargetPos[2]]
-              p.resetDebugVisualizerCamera(distance,yaw,pitch,targetPos);
+              p.resetDebugVisualizerCamera(distance,yaw,pitch,targetPos)
 
             still_open = env.render("human")
 
-            if still_open==False:
+            if not still_open:
                 return
-            if not done: continue
-            if restart_delay==0:
+            if not done:
+                continue
+            if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
-                if still_open!=True:      # not True in multiplayer or non-Roboschool environment
+                if not still_open:      # not True in multiplayer or non-Roboschool environment
                     break
                 restart_delay = 60*2  # 2 sec at 60 fps
             restart_delay -= 1
-            if restart_delay==0: break
+            if restart_delay == 0:
+                break
+
 
 weights_dense1_w = np.array([
 [ +0.3543, -0.3833, +0.3987, +0.1828, +0.5746, +0.3807, +0.1427, +0.2510, -0.3705, -0.2212, +0.0019, +0.7898, +0.2609, -0.5883, -0.1780, +0.1319, +0.4746, -0.5833, -0.4251, +0.5949, +0.6170, -0.2344, +0.1624, -0.7524, -0.1314, +0.3180, -0.3183, -0.5343, +0.6109, -0.0071, +0.0890, +0.1470, +0.3201, -0.1915, -0.1192, -0.2254, +0.1921, +0.5020, +0.8814, +0.7632, +0.2973, -0.0293, +0.0134, -0.1171, +0.4190, +0.2720, -0.1020, +0.2688, -0.3085, -0.0548, +0.4256, +0.5690, -0.2243, +0.4055, +0.7467, +0.2371, -0.1666, -0.3083, -0.2019, -0.1256, -0.2922, -0.0295, -0.1915, +0.4345, +0.4745, +0.4599, +0.7173, +0.1671, -0.1942, +0.6437, +0.1593, -0.2243, -0.3772, +0.0888, +0.0181, +1.5305, +0.1103, -0.0983, +0.5553, -0.2304, +0.1091, -0.7436, -0.4132, -0.0910, -0.3729, +0.5907, -0.0080, -0.3815, +0.4647, -0.4074, +0.2752, +0.2604, +0.2102, +0.1988, +0.5086, +0.1865, -0.5980, +0.1655, +0.3442, -0.0285, +0.4722, -0.4559, -0.8286, +0.2297, +0.1441, +0.5148, +0.9493, +0.3310, +0.1502, +0.1993, +0.4227, +0.8433, -0.3427, +0.7080, +0.3844, +0.4788, +0.0027, +0.0413, -0.2622, -0.2789, -0.1309, -0.0235, +0.9649, -0.3073, +0.4120, -0.1224, +0.3168, -0.4171, +0.2409, +0.8089, +0.2216, +0.7449, +0.1001, -0.0277, -0.2632, +0.0697, +0.2002, +0.4163, -0.1231, +0.3181, +0.4182, +0.9432, +0.5265, +0.0247, +0.0824, +0.2249, -0.5920, +0.1227, -0.4454, +0.2406, +0.2175, +0.4905, +0.2078, +0.1180, -0.2074, +0.2553, -0.4872, +1.0349, +0.0574, -0.0449, -0.3136, +0.1975, -0.1428, +0.1385, +0.0113, -0.0366, -0.2522, +0.7889, -0.5059, +1.0163, +0.4410, +0.0459, -0.2020, +0.3168, -0.8575, +0.4499, -0.0539, -0.0231, -0.0449, +0.0083, +0.0040, +1.1597, -0.3938, +0.0570, +0.2773, +0.7838, +0.5444, +0.3460, +0.0922, -0.0916, -0.1977, -0.2641, +0.5723, +0.1033, -0.6443, +0.1281, +0.4627, +0.6561, +0.0765, +0.2997, +0.4318, -0.4581, +0.0353, +0.1669, +0.0664, -0.0233, +0.0447, +0.3139, +0.0570, +0.0322, +0.7074, -0.0692, +0.0741, +0.1177, +0.7109, +0.1507, -1.0050, +0.0803, +0.1696, -0.7228, -0.3827, +0.3475, -0.0327, +0.0961, +0.5664, +0.2477, +0.3436, -0.0406, +0.2801, +0.1499, +0.0971, -0.2689, +0.0691, -0.1481, -0.1288, +0.5560, +0.2778, +0.2370, +0.1795, +0.3816, +0.8086, +0.2443, -0.2036, +0.8701, +0.3228, +0.0493, +0.4232, +0.2833, +0.1421, +0.0004, -0.3722, -0.8666, -0.1084, -0.2561, -0.2230, -0.0161],

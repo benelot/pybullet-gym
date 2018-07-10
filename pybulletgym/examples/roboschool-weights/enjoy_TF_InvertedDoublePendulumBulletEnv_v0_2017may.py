@@ -9,8 +9,10 @@ import numpy as np
 import pybulletgym.envs
 import time
 
+
 def relu(x):
     return np.maximum(x, 0)
+
 
 class SmallReactivePolicy:
     "Simple multi-layer perceptron policy, no internal state"
@@ -19,12 +21,14 @@ class SmallReactivePolicy:
         assert weights_dense2_w.shape == (64.0, 32.0)
         assert weights_final_w.shape  == (32.0, action_space.shape[0])
 
-    def act(self, ob):
+    @staticmethod
+    def act(ob):
         x = ob
         x = relu(np.dot(x, weights_dense1_w) + weights_dense1_b)
         x = relu(np.dot(x, weights_dense2_w) + weights_dense2_b)
         x = np.dot(x, weights_final_w) + weights_final_b
         return x
+
 
 def main():
     env = gym.make("InvertedDoublePendulumPyBulletEnv-v0")
@@ -44,7 +48,7 @@ def main():
             score += r
             frame += 1
             still_open = env.render("human")
-            if still_open==False:
+            if not still_open:
                 return
             if not done: continue
             if restart_delay==0:
@@ -174,5 +178,5 @@ weights_final_w = np.array([
 
 weights_final_b = np.array([ +0.0190])
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

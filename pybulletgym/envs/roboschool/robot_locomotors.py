@@ -1,10 +1,7 @@
 from .robot_bases import XmlBasedRobot, MJCFBasedRobot, URDFBasedRobot
 import numpy as np
-from pybulletgym.envs.utils import gym_utils as ObjectHelper
+from pybulletgym.envs.roboschool import gym_utils as ObjectHelper
 import pybullet as p
-import os
-import pybullet_data
-from .robot_bases import BodyPart
 
 
 class WalkerBase(XmlBasedRobot):

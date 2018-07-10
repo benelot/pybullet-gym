@@ -58,18 +58,18 @@ class Pusher(MJCFBasedRobot):
 
 	def robot_specific_reset(self, bullet_client):
 		# parts
-		self.fingertip = self.parts["fingertip"]
-		self.target = self.parts["target"]
+		self.fingertip = self.parts["tips_arm"]
+		self.target = self.parts["goal"]
 		self.object = self.parts["object"]
 
 		# joints
-		self.shoulder_pan_joint = self.jdict["shoulder_pan_joint"]
-		self.shoulder_lift_joint = self.jdict["shoulder_lift_joint"]
-		self.upper_arm_roll_joint = self.jdict["upper_arm_roll_joint"]
-		self.elbow_flex_joint = self.jdict["elbow_flex_joint"]
-		self.forearm_roll_joint = self.jdict["forearm_roll_joint"]
-		self.wrist_flex_joint = self.jdict["wrist_flex_joint"]
-		self.wrist_roll_joint = self.jdict["wrist_roll_joint"]
+		self.shoulder_pan_joint = self.jdict["r_shoulder_pan_joint"]
+		self.shoulder_lift_joint = self.jdict["r_shoulder_lift_joint"]
+		self.upper_arm_roll_joint = self.jdict["r_upper_arm_roll_joint"]
+		self.elbow_flex_joint = self.jdict["r_elbow_flex_joint"]
+		self.forearm_roll_joint = self.jdict["r_forearm_roll_joint"]
+		self.wrist_flex_joint = self.jdict["r_wrist_flex_joint"]
+		self.wrist_roll_joint = self.jdict["r_wrist_roll_joint"]
 
 		self.target_pos = np.concatenate([
 			self.np_random.uniform(low=-1, high=1, size=1),
@@ -95,10 +95,10 @@ class Pusher(MJCFBasedRobot):
 
 		# set position of objects
 		self.zero_offset = np.array([0.45, 0.55])
-		self.jdict["target_x"].reset_current_position(self.target_pos[0] - self.zero_offset[0], 0)
-		self.jdict["target_y"].reset_current_position(self.target_pos[1] - self.zero_offset[1], 0)
-		self.jdict["object_x"].reset_current_position(self.object_pos[0] - self.zero_offset[0], 0)
-		self.jdict["object_y"].reset_current_position(self.object_pos[1] - self.zero_offset[1], 0)
+		self.jdict["goal_slidex"].reset_current_position(self.target_pos[0] - self.zero_offset[0], 0)
+		self.jdict["goal_slidey"].reset_current_position(self.target_pos[1] - self.zero_offset[1], 0)
+		self.jdict["obj_slidex"].reset_current_position(self.object_pos[0] - self.zero_offset[0], 0)
+		self.jdict["obj_slidey"].reset_current_position(self.object_pos[1] - self.zero_offset[1], 0)
 
 		# randomize all joints TODO: Will this work or do we have to constrain this resetting in some way?
 		self.shoulder_pan_joint.reset_current_position(self.np_random.uniform(low=-3.14, high=3.14), 0)
@@ -138,22 +138,22 @@ class Striker(MJCFBasedRobot):
 	max_object_placement_radius = 0.8
 
 	def __init__(self):
-		MJCFBasedRobot.__init__(self, 'striker.xml', 'body0', action_dim=7, obs_dim=55)
+		MJCFBasedRobot.__init__(self, 'striker.xml', 'body0', action_dim=7, obs_dim=56)
 
 	def robot_specific_reset(self, bullet_client):
 		# parts
-		self.fingertip = self.parts["fingertip"]
-		self.target = self.parts["coaster"] # the part should be called be target, but coaster is great too
+		self.fingertip = self.parts["tips_arm"]
+		self.target = self.parts["coaster"] # TODO: goal does not show up, but coaster is great too
 		self.object = self.parts["object"]
 
 		# joints
-		self.shoulder_pan_joint = self.jdict["shoulder_pan_joint"]
-		self.shoulder_lift_joint = self.jdict["shoulder_lift_joint"]
-		self.upper_arm_roll_joint = self.jdict["upper_arm_roll_joint"]
-		self.elbow_flex_joint = self.jdict["elbow_flex_joint"]
-		self.forearm_roll_joint = self.jdict["forearm_roll_joint"]
-		self.wrist_flex_joint = self.jdict["wrist_flex_joint"]
-		self.wrist_roll_joint = self.jdict["wrist_roll_joint"]
+		self.shoulder_pan_joint = self.jdict["r_shoulder_pan_joint"]
+		self.shoulder_lift_joint = self.jdict["r_shoulder_lift_joint"]
+		self.upper_arm_roll_joint = self.jdict["r_upper_arm_roll_joint"]
+		self.elbow_flex_joint = self.jdict["r_elbow_flex_joint"]
+		self.forearm_roll_joint = self.jdict["r_forearm_roll_joint"]
+		self.wrist_flex_joint = self.jdict["r_wrist_flex_joint"]
+		self.wrist_roll_joint = self.jdict["r_wrist_roll_joint"]
 
 		self._min_strike_dist = np.inf
 		self._striked = False
@@ -183,22 +183,24 @@ class Striker(MJCFBasedRobot):
 												   high=self.max_object_placement_radius, size=1)
 
 		# reset object position
-		self.jdict["object_x"].reset_current_position(self.object_pos[0] - self.zero_offset[0], 0)
-		self.jdict["object_y"].reset_current_position(self.object_pos[1] - self.zero_offset[1], 0)
+		self.jdict["obj_slidex"].reset_current_position(self.object_pos[0] - self.zero_offset[0], 0)
+		self.jdict["obj_slidey"].reset_current_position(self.object_pos[1] - self.zero_offset[1], 0)
 
 		self.target_pos = np.concatenate([
 			self.np_random.uniform(low=-1, high=1, size=1),
-			self.np_random.uniform(low=-1, high=1, size=1),
-			self.np_random.uniform(low=-1, high=1, size=1)
+			self.np_random.uniform(low=-1, high=1, size=1),#self.np_random.uniform(low=-1, high=1, size=1),
+			np.array([-0.2])
 		])
 
 		# make length of vector between min and max_target_placement_radius
-		self.target_pos = self.target_pos \
-						  / np.linalg.norm(self.target_pos) \
-						  * self.np_random.uniform(low=self.min_target_placement_radius,
-												   high=self.max_target_placement_radius, size=1)
+		# self.target_pos = self.target_pos \
+		# 				  / np.linalg.norm(self.target_pos) \
+		# 				  * self.np_random.uniform(low=self.min_target_placement_radius,
+		# 										   high=self.max_target_placement_radius, size=1)
 
-		self.target.reset_pose(self.target_pos - self.zero_offset, np.array([0, 0, 0, 1]))
+		self.jdict["goal_slidex"].reset_current_position(self.target_pos[0] - self.zero_offset[0], 0)
+		self.jdict["goal_slidey"].reset_current_position(self.target_pos[1] - self.zero_offset[1], 0)
+		#self.target.reset_pose(self.target_pos - self.zero_offset, np.array([0, 0, 0, 1]))
 
 	def apply_action(self, a):
 		assert (np.isfinite(a).all())
@@ -233,18 +235,18 @@ class Thrower(MJCFBasedRobot):
 
 	def robot_specific_reset(self, bullet_client):
 		# parts
-		self.fingertip = self.parts["fingertip"]
-		self.target = self.parts["target"]
-		self.object = self.parts["object"]
+		self.fingertip = self.parts["r_wrist_roll_link"]
+		self.target = self.parts["goal"]
+		self.object = self.parts["ball"]
 
 		# joints
-		self.shoulder_pan_joint = self.jdict["shoulder_pan_joint"]
-		self.shoulder_lift_joint = self.jdict["shoulder_lift_joint"]
-		self.upper_arm_roll_joint = self.jdict["upper_arm_roll_joint"]
-		self.elbow_flex_joint = self.jdict["elbow_flex_joint"]
-		self.forearm_roll_joint = self.jdict["forearm_roll_joint"]
-		self.wrist_flex_joint = self.jdict["wrist_flex_joint"]
-		self.wrist_roll_joint = self.jdict["wrist_roll_joint"]
+		self.shoulder_pan_joint = self.jdict["r_shoulder_pan_joint"]
+		self.shoulder_lift_joint = self.jdict["r_shoulder_lift_joint"]
+		self.upper_arm_roll_joint = self.jdict["r_upper_arm_roll_joint"]
+		self.elbow_flex_joint = self.jdict["r_elbow_flex_joint"]
+		self.forearm_roll_joint = self.jdict["r_forearm_roll_joint"]
+		self.wrist_flex_joint = self.jdict["r_wrist_flex_joint"]
+		self.wrist_roll_joint = self.jdict["r_wrist_roll_joint"]
 
 		self._object_hit_ground = False
 		self._object_hit_location = None
@@ -273,7 +275,7 @@ class Thrower(MJCFBasedRobot):
 												   high=self.max_object_placement_radius, size=1)
 
 		# reset object position
-		self.parts["object"].reset_pose(self.object_pos - self.zero_offset, np.array([0, 0, 0, 1]))
+		self.parts["ball"].reset_pose(self.object_pos - self.zero_offset, np.array([0, 0, 0, 1]))
 
 		self.target_pos = np.concatenate([
 			self.np_random.uniform(low=-1, high=1, size=1),
@@ -287,7 +289,7 @@ class Thrower(MJCFBasedRobot):
 						  * self.np_random.uniform(low=self.min_target_placement_radius,
 												   high=self.max_target_placement_radius, size=1)
 
-		self.parts["target"].reset_pose(self.target_pos - self.zero_offset, np.array([0, 0, 0, 1]))
+		self.parts["goal"].reset_pose(self.target_pos - self.zero_offset, np.array([0, 0, 0, 1]))
 
 	def apply_action(self, a):
 		assert (np.isfinite(a).all())

@@ -9,8 +9,10 @@ import numpy as np
 import pybulletgym.envs
 import time
 
+
 def relu(x):
     return np.maximum(x, 0)
+
 
 class SmallReactivePolicy:
     "Simple multi-layer perceptron policy, no internal state"
@@ -19,12 +21,14 @@ class SmallReactivePolicy:
         assert weights_dense2_w.shape == (64.0, 32.0)
         assert weights_final_w.shape  == (32.0, action_space.shape[0])
 
-    def act(self, ob):
+    @staticmethod
+    def act(ob):
         x = ob
         x = relu(np.dot(x, weights_dense1_w) + weights_dense1_b)
         x = relu(np.dot(x, weights_dense2_w) + weights_dense2_b)
         x = np.dot(x, weights_final_w) + weights_final_b
         return x
+
 
 def main():
     env = gym.make("InvertedPendulumSwingupPyBulletEnv-v0")
@@ -44,15 +48,16 @@ def main():
             score += r
             frame += 1
             still_open = env.render("human")
-            if still_open==False:
+            if not still_open:
                 return
             if not done: continue
-            if restart_delay==0:
+            if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
                 restart_delay = 60*2  # 2 sec at 60 fps
             else:
                 restart_delay -= 1
-                if restart_delay == 0: break
+                if restart_delay == 0:
+                    break
 
 weights_dense1_w = np.array([
 [ +0.5877, -0.5825, -0.5542, -0.2557, -0.4485, +1.4126, +0.2701, -0.6204, -0.2580, +0.2106, -0.2296, +0.7949, +0.6224, -0.0186, +0.4216, +1.0924, -0.1538, -0.2818, +0.4855, -0.2496, +0.7461, -0.6156, +0.0801, +0.7871, -0.4312, -0.9585, +0.1566, -0.2218, -1.0393, +0.6104, -0.5339, +0.8258, +0.4064, +0.0503, +0.4753, -0.8161, +0.0812, +0.2311, -0.9492, -1.1791, +1.2375, +0.2916, +1.2290, +0.2796, -0.8864, -1.1424, -0.5714, +0.1413, +0.7340, -0.4152, +0.2832, -0.3886, +0.4810, -0.7092, -0.5966, +0.1089, +0.1007, +0.5226, -0.3343, +0.1760, +0.4099, -0.9913, -1.1694, -1.0018],
@@ -170,5 +175,5 @@ weights_final_w = np.array([
 
 weights_final_b = np.array([ +0.2753])
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

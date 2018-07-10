@@ -1,7 +1,7 @@
-from pybulletgym.envs.scene_bases import SingleRobotEmptyScene
+from pybulletgym.envs.roboschool.scene_bases import SingleRobotEmptyScene
 from .env_bases import BaseBulletEnv
 import numpy as np
-from pybulletgym.envs.robot_manipulators import Reacher, Pusher, Striker, Thrower
+from pybulletgym.envs.roboschool.robot_manipulators import Reacher, Pusher, Striker, Thrower
 
 
 class ReacherBulletEnv(BaseBulletEnv):
