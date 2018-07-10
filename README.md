@@ -3,15 +3,50 @@ PyBullet Gymperium
 
 *PyBullet Gymperium is an open-source implementation of the OpenAI Gym MuJoCo environments for use with the OpenAI Gym Reinforcement Learning Research Platform in support of open research.*
 
-OpenAI gym is currently one of the most widely used toolkit for developing and comparing reinforcement learning algorithms. Unfortunately, for several challenging continuous control environments it requires the user to install MuJoCo, a commercial physics engine which requires a license to run for longer than 30 days. Such a commercial barrier hinders open research, especially in the perspective that other appropriate physics engines exist. This repository provides alternative implementations of the original MuJoCo environments which can be used for free. The environments have been reimplemented using [BulletPhysics'](https://github.com/bulletphysics/bullet3) python wrapper pybullet, such that they seamlessly integrate into the OpenAI gym framework. In order to show the usability of the new environments, several RL agents from the [Keras-RL](http://keras-rl.readthedocs.io/en/latest/agents/overview/) are configured to be trainable out of the box. To further simplify the training of agents, a Trainer class was implemented which helps to capture commandline arguments in a unified fashion. The Trainer provides a set of standard arguments, but additional arguments can be defined by the agent and the environment to enable the researcher to provide special parameters to either one.
+OpenAI gym is currently one of the most widely used toolkit for developing and comparing reinforcement learning algorithms. Unfortunately, for several challenging continuous control environments it requires the user to install MuJoCo, a commercial physics engine which requires a license to run for longer than 30 days. Such a commercial barrier hinders open research, especially in the perspective that other appropriate physics engines exist. This repository provides alternative implementations of the original MuJoCo environments which can be used for free. The environments have been reimplemented using [BulletPhysics'](https://github.com/bulletphysics/bullet3) python wrapper pybullet, such that they seamlessly integrate into the OpenAI gym framework. In order to show the usability of the new environments, several RL agents from the [Tensorforce](https://github.com/reinforceio/tensorforce) Reinforcement Learning Library are configured to be trainable out of the box. To simplify research with the implemented environment, each environment is featured with pretrained agents which serve as unit tests for the implementations and could well serve as baselines for other purposes. <!--To further simplify the training of agents, a Trainer class was implemented which helps to capture commandline arguments in a unified fashion. The Trainer provides a set of standard arguments, but additional arguments can be defined by the agent and the environment to enable the researcher to provide special parameters to either one.-->
 
-<!--
-!PLEASE REVIEW ALL THIS INFORMATION BEFORE PUBLISHING!
+## State of implementations
+
+Environment Name | Implemented | Similar to Reference Implementation | Pretrained agent available
+---------|---------|---------|---------
+| **RoboSchool Envs** |
+InvertedPendulumPyBulletEnv-v0      | Yes | Yes | No
+InvertedDoublePendulumPyBulletEnv-v0      | Yes | Yes | No
+InvertedPendulumSwingupPyBulletEnv-v0      | Yes | Yes | No
+ReacherPyBulletEnv-v0      | Yes | Yes | No
+Walker2DPyBulletEnv-v0      | Yes | Yes | No
+HalfCheetahPyBulletEnv-v0      | Yes | Yes | No
+AntPyBulletEnv-v0      | Yes | Yes | No
+HopperPyBulletEnv-v0      | Yes | Yes | No
+HumanoidPyBulletEnv-v0      | Yes | Yes | No
+HumanoidFlagrunPyBulletEnv-v0      | Yes | Yes | No
+HumanoidFlagrunHarderPyBulletEnv-v0      | Yes | Yes | No
+AtlasPyBulletEnv-v0      | Yes | No | No
+PusherPyBulletEnv-v0      | Yes | No | No
+ThrowerPyBulletEnv-v0      | Yes | No | No
+StrikerPyBulletEnv-v0      | Yes | No | No
+| **MuJoCo Envs** |
+InvertedPendulumMuJoCoEnv-v0      | No | No | No
+InvertedDoublePendulumMuJoCoEnv-v0      | No | No | No
+InvertedPendulumSwingupMuJoCoEnv-v0      | No | No | No
+ReacherMuJoCoEnv-v0      | No | No | No
+Walker2DMuJoCoEnv-v0      | No | No | No
+HalfCheetahMuJoCoEnv-v0      | No | No | No
+AntMuJoCotEnv-v0      | No | No | No
+HopperMuJoCoEnv-v0      | No | No | No
+HumanoidMuJoCoEnv-v0      | No | No | No
+HumanoidFlagrunMuJoCoEnv-v0      | No | No | No
+HumanoidFlagrunHarderMuJoCoEnv-v0      | No | No | No
+AtlasMuJoCoEnv-v0      | No | No | No
+PusherMuJoCoEnv-v0      | No | No | No
+ThrowerMuJoCoEnv-v0      | No | No | No
+StrikerMuJoCoEnv-v0      | No | No | No
 
 
 [See What's New section below](#What's New)
 
 ## Basics
+(taken from OpenAI gym readme)
 
 There are two basic concepts in reinforcement learning: the
 environment (namely, the outside world) and the agent (namely, the
@@ -28,7 +63,7 @@ should know:
 - `step(self, action)`: Step the environment by one timestep. Returns `observation`, `reward`, `done`, `info`.
 - `render(self, mode='human', close=False)`: Render one frame of the environment. The default mode will do something human friendly, such as pop up a window. Passing the `close` flag signals the renderer to close any such windows.
 
-==Add concept of scene and robot as subconcept of environment
+**In addition to the basic concepts of reinforcement learning, this framework extends the notion of an environment into two subconcepts being the robot (the agents directly controllable body) and the scene (all things the agents interacts with). Implementing RL environments in this way allows us to switch parts of the environment to generate new robot-scene combinations.**
 
 ## Installation
 
@@ -39,13 +74,6 @@ You can perform a minimal install of ``gym`` with:
 	  cd gym
 	  pip install -e .
 ```
-
-If you prefer, you can do a minimal install of the packaged version directly from PyPI:
-
-```bash
-	  pip install gym
-```
-
 
 ## Supported systems
 
@@ -60,28 +88,11 @@ pip``. Alternatively, you can open `setup.py
 <https://github.com/openai/gym/blob/master/setup.py>`_ and
 install the dependencies by hand.
 
-Rendering on a server
----------------------
-
-If you're trying to render video on a server, you'll need to connect a
-fake display. The easiest way to do this is by running under
-``xvfb-run`` (on Ubuntu, install the ``xvfb`` package):
-
-```bash
-     xvfb-run -s "-screen 0 1400x900x24" bash
-```
-
-Installing dependencies for specific environments
--------------------------------------------------
-
-If you'd like to install the dependencies for only specific
-environments, see `setup.py
-<https://github.com/openai/gym/blob/master/setup.py>`_. We
-maintain the lists of dependencies on a per-environment group basis.
-
 ## Agents
 
-==Add some agents
+As some sort of unit test for the environments, we provide pretrained agents for each environment. The agents for the roboschool envs and the mujoco were trained on the original implementations of roboschool and mujoco respectively.
+
+
 
 ## Environments
 
@@ -92,6 +103,7 @@ specification of each task is in `gym/envs/__init__.py
 <https://github.com/openai/gym/blob/master/gym/envs/__init__.py>`_. It's
 worth browsing through both.
 
+<!--
 ## Examples
 
 See the 'examples' directory.
@@ -107,7 +119,22 @@ See the 'examples' directory.
 * 2018-01-09 Pybullet-gym is born.
 
 ## Roadmap
-1. Replicate Gym MuJoCo environments.
-2. Implement DeepMind Control Suite gyms.
-3. Explore other types of gyms/multi agent gyms.
+<ol>
+	<li> [ROBOSCHOOL GYMS] The current gyms are the roboschool gyms ported to
+pybullet. So far, most of them work well, except for the manipulator envs
+striker, pusher and thrower, where the robot is not correctly loaded. This
+		will have to be fixed with Erwin Coumans.</li>
+<li> [OPENAI MUJOCO GYMS] Soon I will start to port the OpenAI gyms, which
+unfortunately have a slightly different observation (and probably action)
+vector. I can setup all the gyms quickly, but it will take a while to find
+out what some of observations are in mujoco and what they correspond to in
+pybullet. Some of the observations might not be exposed on pybullet, then
+we can request them, for others it is already hard to know what they are in
+mujoco.</li>
+<li>[OPENAI ROBOTICS GYMS] Next in line would be the robotics gyms in OpenAI.
+These are particularly delicate simulations and might take some tuning to
+even be simulatable in pybullet.</li>
+4.[DEEPMIND CONTROL SUITE] Then there is Deepmind Control Suite, another set
+of gyms which are in mujoco and need to be freed. </li>
+</ol>
 
