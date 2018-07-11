@@ -17,9 +17,9 @@ def relu(x):
 class SmallReactivePolicy:
     "Simple multi-layer perceptron policy, no internal state"
     def __init__(self, observation_space, action_space):
-        assert weights_dense1_w.shape == (observation_space.shape[0], 64.0)
-        assert weights_dense2_w.shape == (64.0, 32.0)
-        assert weights_final_w.shape  == (32.0, action_space.shape[0])
+        assert weights_dense1_w.shape == (observation_space.shape[0], 64)
+        assert weights_dense2_w.shape == (64, 32)
+        assert weights_final_w.shape  == (32, action_space.shape[0])
 
     @staticmethod
     def act(ob):
@@ -31,6 +31,7 @@ class SmallReactivePolicy:
 
 
 def main():
+    print("create env")
     env = gym.make("InvertedPendulumSwingupPyBulletEnv-v0")
     env.render(mode="human")
     pi = SmallReactivePolicy(env.observation_space, env.action_space)
@@ -40,17 +41,18 @@ def main():
         score = 0
         restart_delay = 0
         obs = env.reset()
-
+        print("frame")
         while 1:
-            time.sleep(0.05)
+            time.sleep(0.02)
             a = pi.act(obs)
             obs, r, done, _ = env.step(a)
             score += r
             frame += 1
             still_open = env.render("human")
-            if not still_open:
+            if still_open is None:
                 return
-            if not done: continue
+            if not done:
+                continue
             if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
                 restart_delay = 60*2  # 2 sec at 60 fps

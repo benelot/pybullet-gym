@@ -14,17 +14,17 @@ InvertedPendulumPyBulletEnv-v0      | Yes | Yes | No
 InvertedDoublePendulumPyBulletEnv-v0      | Yes | Yes | No
 InvertedPendulumSwingupPyBulletEnv-v0      | Yes | Yes | No
 ReacherPyBulletEnv-v0      | Yes | Yes | No
-Walker2DPyBulletEnv-v0      | Yes | Yes | No
-HalfCheetahPyBulletEnv-v0      | Yes | Yes | No
+Walker2DPyBulletEnv-v0      | Yes | No | No
+HalfCheetahPyBulletEnv-v0      | Yes | No | No
 AntPyBulletEnv-v0      | Yes | Yes | No
 HopperPyBulletEnv-v0      | Yes | Yes | No
 HumanoidPyBulletEnv-v0      | Yes | Yes | No
 HumanoidFlagrunPyBulletEnv-v0      | Yes | Yes | No
 HumanoidFlagrunHarderPyBulletEnv-v0      | Yes | Yes | No
-AtlasPyBulletEnv-v0      | Yes | No | No
-PusherPyBulletEnv-v0      | Yes | No | No
-ThrowerPyBulletEnv-v0      | Yes | No | No
-StrikerPyBulletEnv-v0      | Yes | No | No
+AtlasPyBulletEnv-v0      | WIP | No | No
+PusherPyBulletEnv-v0      | WIP | No | No
+ThrowerPyBulletEnv-v0      | WIP | No | No
+StrikerPyBulletEnv-v0      | WIP | No | No
 | **MuJoCo Envs** |
 InvertedPendulumMuJoCoEnv-v0      | No | No | No
 InvertedDoublePendulumMuJoCoEnv-v0      | No | No | No

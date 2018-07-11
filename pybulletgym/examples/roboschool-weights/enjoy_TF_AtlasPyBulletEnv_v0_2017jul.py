@@ -1,6 +1,5 @@
 #add parent dir to find package. Only needed for source code build, pip install doesn't need it.
-import os
-import inspect
+import os, inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(os.path.dirname(currentdir))
 os.sys.path.insert(0,parentdir)
@@ -33,6 +32,7 @@ class SmallReactivePolicy:
 
 
 def main():
+    print("create env")
     env = gym.make("AtlasPyBulletEnv-v0")
     env.render(mode="human")
     pi = SmallReactivePolicy(env.observation_space, env.action_space)
@@ -50,22 +50,23 @@ def main():
         score = 0
         restart_delay = 0
         obs = env.reset()
-
+        print("frame")
         while 1:
-            time.sleep(0.001)
+            time.sleep(0.02)
             a = pi.act(obs)
             obs, r, done, _ = env.step(a)
             score += r
             frame += 1
-            distance=5
+            distance = 5
             yaw = 0
             humanPos, humanOrn = p.getBasePositionAndOrientation(torsoId)
             p.resetDebugVisualizerCamera(distance, yaw, -20, humanPos)
 
             still_open = env.render("human")
-            if not still_open:
+            if still_open is None:
                 return
-            if not done: continue
+            if not done:
+                continue
             if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
                 restart_delay = 60*2  # 2 sec at 60 fps
@@ -353,5 +354,5 @@ weights_final_b = np.array([ +0.0449, -0.1522, -0.0433, -0.2231, -0.0719, -0.075
 
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

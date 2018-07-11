@@ -51,7 +51,7 @@ def main():
         obs = env.reset()
        
         while 1:
-            time.sleep(0.001)
+            time.sleep(0.02)
             a = pi.act(obs)
             obs, r, done, _ = env.step(a)
             score += r
@@ -62,7 +62,7 @@ def main():
             p.resetDebugVisualizerCamera(distance, yaw, -20, humanPos)
 
             still_open = env.render("human")
-            if not still_open:
+            if still_open is None:
                 return
             if not done: continue
             if restart_delay == 0:

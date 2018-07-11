@@ -17,9 +17,9 @@ def relu(x):
 class SmallReactivePolicy:
     "Simple multi-layer perceptron policy, no internal state"
     def __init__(self, observation_space, action_space):
-        assert weights_dense1_w.shape == (observation_space.shape[0], 64.0)
-        assert weights_dense2_w.shape == (64.0, 32.0)
-        assert weights_final_w.shape  == (32.0, action_space.shape[0])
+        assert weights_dense1_w.shape == (observation_space.shape[0], 64)
+        assert weights_dense2_w.shape == (64, 32)
+        assert weights_final_w.shape  == (32, action_space.shape[0])
 
     @staticmethod
     def act(ob):
@@ -31,6 +31,7 @@ class SmallReactivePolicy:
 
 
 def main():
+    print("create env")
     env = gym.make("InvertedDoublePendulumPyBulletEnv-v0")
     env.render(mode="human")
     pi = SmallReactivePolicy(env.observation_space, env.action_space)
@@ -40,23 +41,25 @@ def main():
         score = 0
         restart_delay = 0
         obs = env.reset()
-
+        print("frame")
         while 1:
-            time.sleep(0.05)
+            time.sleep(0.02)
             a = pi.act(obs)
             obs, r, done, _ = env.step(a)
             score += r
             frame += 1
             still_open = env.render("human")
-            if not still_open:
+            if still_open is None:
                 return
-            if not done: continue
-            if restart_delay==0:
+            if not done:
+                continue
+            if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
                 restart_delay = 60*2  # 2 sec at 60 fps
             else:
                 restart_delay -= 1
-                if restart_delay == 0: break
+                if restart_delay == 0:
+                    break
 
 weights_dense1_w = np.array([
 [ -0.5857, +0.1810, +0.2839, +0.1278, -0.4302, -0.3152, +0.5916, -0.0635, +0.6259, +0.2873, -0.0572, -0.3538, -0.8121, +0.2707, +0.1656, -0.2103, -0.1614, -0.2789, -0.5856, -0.4733, +0.1838, +0.1063, +0.7629, +0.0873, +0.1480, +0.1768, +0.6522, +0.1158, -0.0816, +0.6542, -0.8870, +0.1775, +0.1532, +0.2268, -0.0313, -0.0470, +0.5328, -0.0570, +0.4820, -0.3772, -0.7581, +0.2835, -0.3566, +0.9371, -0.0441, -0.1797, -0.2859, -0.0238, +0.0261, -0.0296, -0.1406, +0.2869, +0.1279, +0.6653, +0.5643, -0.3136, +0.7751, +0.2341, +0.1903, +0.8283, -0.0697, +0.1276, -0.0250, -0.0053],

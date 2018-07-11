@@ -32,6 +32,7 @@ class SmallReactivePolicy:
 
 
 def main():
+    print("create env")
     env = gym.make("HumanoidFlagrunHarderPyBulletEnv-v0")
     env.render(mode="human")
     pi = SmallReactivePolicy(env.observation_space, env.action_space)
@@ -51,7 +52,7 @@ def main():
         obs = env.reset()
 
         while 1:
-            time.sleep(0.001)
+            time.sleep(0.02)
             a = pi.act(obs)
             obs, r, done, _ = env.step(a)
             score += r
@@ -59,12 +60,13 @@ def main():
             distance=5
             yaw = 0
             humanPos, humanOrn = p.getBasePositionAndOrientation(torsoId)
-            p.resetDebugVisualizerCamera(distance,yaw,-20,humanPos)
+            p.resetDebugVisualizerCamera(distance, yaw, -20, humanPos)
 
             still_open = env.render("human")
-            if not still_open:
+            if still_open is None:
                 return
-            if not done: continue
+            if not done:
+                continue
             if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
                 restart_delay = 60*2  # 2 sec at 60 fps

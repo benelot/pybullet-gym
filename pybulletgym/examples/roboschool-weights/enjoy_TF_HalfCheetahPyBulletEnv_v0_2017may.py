@@ -32,13 +32,14 @@ class SmallReactivePolicy:
 
 
 def main():
+    print("create env")
     env = gym.make("HalfCheetahPyBulletEnv-v0")
     env.render(mode="human")
     pi = SmallReactivePolicy(env.observation_space, env.action_space)
     #disable rendering during reset, makes loading much faster
     env.reset()
     torsoId = -1
-    for i in range (p.getNumBodies()):
+    for i in range(p.getNumBodies()):
         print(p.getBodyInfo(i))
         if p.getBodyInfo(i)[1].decode() == "cheetah":
            torsoId = i
@@ -52,9 +53,9 @@ def main():
         score = 0
         restart_delay = 0
         obs = env.reset()
-     
+        print("frame")
         while 1:
-            time.sleep(0.001)
+            time.sleep(0.02)
             a = pi.act(obs)
             obs, r, done, _ = env.step(a)
             score += r
@@ -63,10 +64,12 @@ def main():
             yaw = 0
             humanPos = p.getLinkState(torsoId,4)[0]
             p.resetDebugVisualizerCamera(distance,yaw,-20,humanPos)
+
             still_open = env.render("human")
-            if not still_open:
+            if still_open is None:
                 return
-            if not done: continue
+            if not done:
+                continue
             if restart_delay == 0:
                 print("score=%0.2f in %i frames" % (score, frame))
                 restart_delay = 60*2  # 2 sec at 60 fps
@@ -308,5 +311,5 @@ weights_final_w = np.array([
 
 weights_final_b = np.array([ +0.1367, +0.1107, -0.0148, +0.1158, -0.0820, +0.3047])
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

@@ -43,13 +43,13 @@ def main():
         obs = env.reset()
         print("frame")
         while 1:
-            time.sleep(0.05)
+            time.sleep(0.02)
             a = pi.act(obs)
             obs, r, done, _ = env.step(a)
             score += r
             frame += 1
             still_open = env.render("human")
-            if not still_open:
+            if still_open is None:
                 return
             if not done:
                 continue
@@ -177,5 +177,5 @@ weights_final_w = np.array([
 
 weights_final_b = np.array([ +0.0352])
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
