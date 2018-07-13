@@ -33,7 +33,7 @@ from tensorforce.agents import Agent
 from tensorforce.execution import Runner
 from tensorforce.contrib.openai_gym import OpenAIGym
 
-
+# Roboschool
 # Examples (train)
 # python ./openai_gym.py InvertedPendulumPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/invpendulumv0-ckpts/invpdv0 -D
 # python ./openai_gym.py InvertedDoublePendulumPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/invdpendulumv0-ckpts/invdpdv0 -D
@@ -51,6 +51,10 @@ from tensorforce.contrib.openai_gym import OpenAIGym
 # python ./openai_gym.py HalfCheetahPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/hcheetahv0-ckpts/ -D --test --visualize
 # python ./openai_gym.py HumanoidPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/humanoidv0-ckpts/ -D --test --visualize
 # python ./openai_gym.py PusherPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/pusherv0-ckpts/ -D --test --visualize
+
+# MuJoCo
+#python ./openai_gym.py InvertedPendulumMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-invpendulumv2/ -D --test --visualize
+#python ./openai_gym.py InvertedDoublePendulumMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-invdpendulumv2/ -D --test --visualize
 
 # For detailed explanations about the options, check the arguments implementation below or on the tensorforce main repository: https://github.com/reinforceio/tensorforce
 

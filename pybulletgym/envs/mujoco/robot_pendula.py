@@ -3,7 +3,6 @@ import numpy as np
 
 
 class InvertedPendulum(MJCFBasedRobot):
-	swingup = False
 
 	def __init__(self):
 		MJCFBasedRobot.__init__(self, 'inverted_pendulum.xml', 'cart', action_dim=1, obs_dim=4)
@@ -49,13 +48,10 @@ class InvertedPendulum(MJCFBasedRobot):
 			x, self.theta,
 			vx, theta_dot])  # np.concatenate([self.sim.data.qpos, self.sim.data.qvel]).ravel()
 
-class InvertedPendulumSwingup(InvertedPendulum):
-	swingup = True
-
 
 class InvertedDoublePendulum(MJCFBasedRobot):
 	def __init__(self):
-		MJCFBasedRobot.__init__(self,  'inverted_double_pendulum.xml', 'cart', action_dim=1, obs_dim=9)
+		MJCFBasedRobot.__init__(self,  'inverted_double_pendulum.xml', 'cart', action_dim=1, obs_dim=11)
 
 	def robot_specific_reset(self, bullet_client):
 		self._p = bullet_client
@@ -77,13 +73,14 @@ class InvertedDoublePendulum(MJCFBasedRobot):
 		theta, theta_dot = self.j1.current_position()
 		gamma, gamma_dot = self.j2.current_position()
 		x, vx = self.slider.current_position()
-		#self.pos_x, _, self.pos_y = self.pole2.pose().xyz()
 		assert( np.isfinite(x) )
 		qfrc_constraint = 0 # FIND qfrc_constraint in pybullet
 		return np.concatenate([
-			x,                                              # self.sim.data.qpos[:1],  # cart x pos
+			[x],                                              # self.sim.data.qpos[:1],  # cart x pos
 			np.sin([theta, gamma]),                         # np.sin(self.sim.data.qpos[1:]),  # link angles
 			np.cos([theta, gamma]),                         # np.cos(self.sim.data.qpos[1:]),
 			np.clip([vx, theta_dot, gamma_dot], -10 , 10),  # np.clip(self.sim.data.qvel, -10, 10),
-			np.clip(qfrc_constraint, -10, 10)               # np.clip(self.sim.data.qfrc_constraint, -10, 10)
+			np.clip([qfrc_constraint,
+					qfrc_constraint,
+					qfrc_constraint], -10, 10)              # np.clip(self.sim.data.qfrc_constraint, -10, 10)
 			]).ravel()

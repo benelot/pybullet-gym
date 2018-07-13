@@ -110,6 +110,13 @@ register(
 	reward_threshold=950.0,
 )
 
+register(
+	id='InvertedDoublePendulumMuJoCoEnv-v0',
+	entry_point='pybulletgym.envs.mujoco.gym_pendulum_envs:InvertedDoublePendulumMuJoCoEnv',
+	max_episode_steps=1000,
+	reward_threshold=9100.0,
+)
+
 
 def getList():
 	btenvs = ['- ' + spec.id for spec in gym.pgym.envs.registry.all() if spec.id.find('Bullet')>=0]
