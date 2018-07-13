@@ -1,5 +1,6 @@
 from gym.envs.registration import register
 
+# roboschool envs
 register(
 	id='InvertedPendulumPyBulletEnv-v0',
 	entry_point='pybulletgym.envs.roboschool.gym_pendulum_envs:InvertedPendulumBulletEnv',
@@ -100,6 +101,15 @@ register(
 	entry_point='pybulletgym.envs.roboschool.gym_locomotion_envs:AtlasBulletEnv',
 	max_episode_steps=1000
 	)
+
+# mujoco envs
+register(
+	id='InvertedPendulumMuJoCoEnv-v0',
+	entry_point='pybulletgym.envs.mujoco.gym_pendulum_envs:InvertedPendulumMuJoCoEnv',
+	max_episode_steps=1000,
+	reward_threshold=950.0,
+)
+
 
 def getList():
 	btenvs = ['- ' + spec.id for spec in gym.pgym.envs.registry.all() if spec.id.find('Bullet')>=0]
