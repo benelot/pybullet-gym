@@ -1,6 +1,0 @@
-model_checkpoint_path: "ppo-mujoco-halfcheetahv2-63100000"
-all_model_checkpoint_paths: "ppo-mujoco-halfcheetahv2-62700000"
-all_model_checkpoint_paths: "ppo-mujoco-halfcheetahv2-62800000"
-all_model_checkpoint_paths: "ppo-mujoco-halfcheetahv2-62900000"
-all_model_checkpoint_paths: "ppo-mujoco-halfcheetahv2-63000000"
-all_model_checkpoint_paths: "ppo-mujoco-halfcheetahv2-63100000"

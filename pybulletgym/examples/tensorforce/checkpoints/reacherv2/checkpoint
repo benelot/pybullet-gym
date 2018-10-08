@@ -1,6 +1,0 @@
-model_checkpoint_path: "ppo-mujoco-reacherv2-45540000"
-all_model_checkpoint_paths: "ppo-mujoco-reacherv2-45520000"
-all_model_checkpoint_paths: "ppo-mujoco-reacherv2-45525000"
-all_model_checkpoint_paths: "ppo-mujoco-reacherv2-45530000"
-all_model_checkpoint_paths: "ppo-mujoco-reacherv2-45535000"
-all_model_checkpoint_paths: "ppo-mujoco-reacherv2-45540000"
