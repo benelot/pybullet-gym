@@ -259,6 +259,9 @@ class BodyPart:
 	def get_orientation(self):
 		return self.current_orientation()
 
+	def get_velocity(self):
+		return self._p.getBaseVelocity(self.bodies[self.bodyIndex])
+
 	def reset_position(self, position):
 		self._p.resetBasePositionAndOrientation(self.bodies[self.bodyIndex], position, self.get_orientation())
 

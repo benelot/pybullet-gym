@@ -27,6 +27,7 @@ import logging
 import os
 import time
 
+import gym.envs
 import pybulletgym.envs
 from tensorforce import TensorForceError
 from tensorforce.agents import Agent
@@ -53,10 +54,26 @@ from tensorforce.contrib.openai_gym import OpenAIGym
 # python ./openai_gym.py PusherPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/pusherv0-ckpts/ -D --test --visualize
 
 # MuJoCo
-#python ./openai_gym.py InvertedPendulumMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-invpendulumv2/ -D --test --visualize
-#python ./openai_gym.py InvertedDoublePendulumMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-invdpendulumv2/ -D --test --visualize
+# Examples (train)
+# python ./openai_gym.py InvertedPendulumPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/mujoco-invpendulumv0/invpdv0 -D
+# python ./openai_gym.py InvertedDoublePendulumPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/mujoco-invdpendulumv0/invdpdv0 -D
+# python ./openai_gym.py ReacherPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/mujoco-reacherv0/reacherv0 -D
+# python ./openai_gym.py HopperMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/mujoco-hopperv0/hopperv0 -D
+# python ./openai_gym.py AntPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/mujoco-antv0/antv0 -D
+# python ./openai_gym.py HalfCheetahPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/mujoco-halfcheetahv0/halfcheetahv0 -D
+# python ./openai_gym.py HumanoidPyBulletEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -s ./checkpoints/mujoco-humanoidv0/humanoidv0 -D
+
+# Examples (test)
+# python ./openai_gym.py InvertedPendulumMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-invpendulumv2/ -D --test --visualize
+# python ./openai_gym.py InvertedDoublePendulumMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-invdpendulumv2/ -D --test --visualize
+# python ./openai_gym.py ReacherMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-reacherv2/ -D --test --visualize
+# python ./openai_gym.py AntMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-antv2/ -D --test --visualize
+# python ./openai_gym.py HalfCheetahMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-halfcheetahv2/ -D --test --visualize
+# python ./openai_gym.py HumanoidMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-humanoidv2/ -D --test --visualize
+# python ./openai_gym.py PusherMuJoCoEnv-v0 -a ./configs/ppo.json -n ./configs/mlp2_network.json -e 1000000 -m 2000 -l ./checkpoints/mujoco-pusherv2/ -D --test --visualize
 
 # For detailed explanations about the options, check the arguments implementation below or on the tensorforce main repository: https://github.com/reinforceio/tensorforce
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -79,6 +96,7 @@ def main():
     parser.add_argument('-te', '--test', action='store_true', default=False, help="Test agent without learning.")
     parser.add_argument('--job', type=str, default=None, help="For distributed mode: The job type of this agent.")
     parser.add_argument('--task', type=int, default=0, help="For distributed mode: The task index of this agent.")
+    parser.add_argument('--sleep', type=float, default=None, help='To make the simulation slower for analysis.')
 
     args = parser.parse_args()
 
@@ -189,7 +207,8 @@ def main():
         max_episode_timesteps=args.max_episode_timesteps,
         deterministic=args.deterministic,
         episode_finished=episode_finished,
-        testing=args.test
+        testing=args.test,
+        sleep=args.sleep
     )
     runner.close()
 
