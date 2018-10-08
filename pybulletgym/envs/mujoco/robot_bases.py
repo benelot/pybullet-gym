@@ -115,7 +115,7 @@ class MJCFBasedRobot(XmlBasedRobot):
 		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "mjcf", self.model_xml)
 
 		self._p = bullet_client
-		print("Created bullet_client with id=", self._p._client)
+		#print("Created bullet_client with id=", self._p._client)
 		if self.doneLoading == 0:
 			self.ordered_joints = []
 			self.doneLoading=1
