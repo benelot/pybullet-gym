@@ -103,12 +103,13 @@ class MJCFBasedRobot(XmlBasedRobot):
 		XmlBasedRobot.__init__(self, robot_name, action_dim, obs_dim, self_collision)
 		self.model_xml = model_xml
 		self.doneLoading=0
-	def reset(self, bullet_client):
 
+	def reset(self, bullet_client):
 		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "mjcf", self.model_xml)
 
 		self._p = bullet_client
-		if (self.doneLoading==0):
+		# print("Created bullet_client with id=", self._p._client)
+		if self.doneLoading == 0:
 			self.ordered_joints = []
 			self.doneLoading=1
 			if self.self_collision:
@@ -257,6 +258,9 @@ class BodyPart:
 
 	def get_orientation(self):
 		return self.current_orientation()
+
+	def get_velocity(self):
+		return self._p.getBaseVelocity(self.bodies[self.bodyIndex])
 
 	def reset_position(self, position):
 		self._p.resetBasePositionAndOrientation(self.bodies[self.bodyIndex], position, self.get_orientation())

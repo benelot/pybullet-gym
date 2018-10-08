@@ -117,7 +117,40 @@ register(
 	reward_threshold=9100.0,
 )
 
+register(
+	id='Walker2DMuJoCoEnv-v0',
+	entry_point='pybulletgym.envs.mujoco.gym_locomotion_envs:Walker2DMuJoCoEnv',
+	max_episode_steps=1000,
+	reward_threshold=2500.0
+)
+register(
+	id='HalfCheetahMuJoCoEnv-v0',
+	entry_point='pybulletgym.envs.mujoco.gym_locomotion_envs:HalfCheetahMuJoCoEnv',
+	max_episode_steps=1000,
+	reward_threshold=3000.0
+)
 
-def getList():
-	btenvs = ['- ' + spec.id for spec in gym.pgym.envs.registry.all() if spec.id.find('Bullet')>=0]
-	return btenvs
+register(
+	id='AntMuJoCoEnv-v0',
+	entry_point='pybulletgym.envs.mujoco.gym_locomotion_envs:AntMuJoCoEnv',
+	max_episode_steps=1000,
+	reward_threshold=2500.0
+)
+
+register(
+	id='HopperMuJoCoEnv-v0',
+	entry_point='pybulletgym.envs.mujoco.gym_locomotion_envs:HopperMuJoCoEnv',
+	max_episode_steps=1000,
+	reward_threshold=2500.0
+)
+
+register(
+	id='HumanoidMuJoCoEnv-v0',
+	entry_point='pybulletgym.envs.mujoco.gym_locomotion_envs:HumanoidMuJoCoEnv',
+	max_episode_steps=1000
+)
+
+
+def get_list():
+	envs = ['- ' + spec.id for spec in gym.pgym.envs.registry.all() if spec.id.find('Bullet') >= 0 or spec.id.find('MuJoCo') >= 0]
+	return envs

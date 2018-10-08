@@ -14,12 +14,13 @@ class XmlBasedRobot:
 
 	self_collision = True
 
-	def __init__(self, robot_name, action_dim, obs_dim, self_collision):
+	def __init__(self, robot_name, action_dim, obs_dim, self_collision, add_ignored_joints=False):
 		self.parts = None
 		self.objects = []
 		self.jdict = None
 		self.ordered_joints = None
 		self.robot_body = None
+		self.add_ignored_joints = add_ignored_joints
 
 		high = np.ones([action_dim])
 		self.action_space = gym.spaces.Box(-high, high)
@@ -58,7 +59,7 @@ class XmlBasedRobot:
 				part_name = part_name.decode("utf8")
 				parts[part_name] = BodyPart(self._p, part_name, bodies, i, -1)
 			for j in range(self._p.getNumJoints(bodies[i])):
-				self._p.setJointMotorControl2(bodies[i],j,pybullet.POSITION_CONTROL,positionGain=0.1,velocityGain=0.1,force=0)
+				self._p.setJointMotorControl2(bodies[i], j, pybullet.POSITION_CONTROL, positionGain=0.1, velocityGain=0.1, force=0)
 				jointInfo = self._p.getJointInfo(bodies[i], j)
 				joint_name=jointInfo[1]
 				part_name=jointInfo[12]
@@ -79,7 +80,12 @@ class XmlBasedRobot:
 					self.robot_body = parts[self.robot_name]
 
 				if joint_name[:6] == "ignore":
-					Joint(self._p, joint_name, bodies, i, j).disable_motor()
+					ignored_joint = Joint(self._p, joint_name, bodies, i, j)
+					ignored_joint.disable_motor()
+					if self.add_ignored_joints:  # some of the robots (Hopper, Walker2D and HalfCheetah in mujoco) require read-access to these joints
+						joints[joint_name] = ignored_joint
+						ordered_joints.append(ignored_joint)
+						joints[joint_name].power_coef = 0.0
 					continue
 
 				if joint_name[:8] != "jointfix":
@@ -99,21 +105,23 @@ class MJCFBasedRobot(XmlBasedRobot):
 	Base class for mujoco .xml based agents.
 	"""
 
-	def __init__(self, model_xml, robot_name, action_dim, obs_dim, self_collision=True):
-		XmlBasedRobot.__init__(self, robot_name, action_dim, obs_dim, self_collision)
+	def __init__(self, model_xml, robot_name, action_dim, obs_dim, self_collision=True, add_ignored_joints=False):
+		XmlBasedRobot.__init__(self, robot_name, action_dim, obs_dim, self_collision, add_ignored_joints)
 		self.model_xml = model_xml
 		self.doneLoading=0
+
 	def reset(self, bullet_client):
 
 		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "mjcf", self.model_xml)
 
 		self._p = bullet_client
+		#print("Created bullet_client with id=", self._p._client)
 		if self.doneLoading == 0:
 			self.ordered_joints = []
 			self.doneLoading=1
 			if self.self_collision:
 				self.objects = self._p.loadMJCF(full_path, flags=pybullet.URDF_USE_SELF_COLLISION|pybullet.URDF_USE_SELF_COLLISION_EXCLUDE_ALL_PARENTS)
-				self.parts, self.jdict, self.ordered_joints, self.robot_body = self.addToScene(self._p, self.objects	)
+				self.parts, self.jdict, self.ordered_joints, self.robot_body = self.addToScene(self._p, self.objects)
 			else:
 				self.objects = self._p.loadMJCF(full_path)
 				self.parts, self.jdict, self.ordered_joints, self.robot_body = self.addToScene(self._p, self.objects)
@@ -202,7 +210,7 @@ class SDFBasedRobot(XmlBasedRobot):
 		return 0
 
 
-class Pose_Helper: # dummy class to comply to original interface
+class PoseHelper: # dummy class to comply to original interface
 	def __init__(self, body_part):
 		self.body_part = body_part
 
@@ -215,6 +223,10 @@ class Pose_Helper: # dummy class to comply to original interface
 	def orientation(self):
 		return self.body_part.current_orientation()
 
+	def speed(self):
+		return self.body_part.speed()
+
+
 class BodyPart:
 	def __init__(self, bullet_client, body_name, bodies, bodyIndex, bodyPartIndex):
 		self.bodies = bodies
@@ -223,7 +235,7 @@ class BodyPart:
 		self.bodyPartIndex = bodyPartIndex
 		self.initialPosition = self.current_position()
 		self.initialOrientation = self.current_orientation()
-		self.bp_pose = Pose_Helper(self)
+		self.bp_pose = PoseHelper(self)
 
 	def state_fields_of_pose_of(self, body_id, link_id=-1):  # a method you will most probably need a lot to get pose and orientation
 		if link_id == -1:
@@ -253,6 +265,9 @@ class BodyPart:
 
 	def get_orientation(self):
 		return self.current_orientation()
+
+	def get_velocity(self):
+		return self._p.getBaseVelocity(self.bodies[self.bodyIndex])
 
 	def reset_position(self, position):
 		self._p.resetBasePositionAndOrientation(self.bodies[self.bodyIndex], position, self.get_orientation())
@@ -292,7 +307,7 @@ class Joint:
 	def set_state(self, x, vx):
 		self._p.resetJointState(self.bodies[self.bodyIndex], self.jointIndex, x, vx)
 
-	def current_position(self): # just some synonym method
+	def current_position(self):  # just some synonym method
 		return self.get_state()
 
 	def current_relative_position(self):

@@ -24,9 +24,9 @@ class InvertedPendulum(MJCFBasedRobot):
 		self.slider.set_motor_torque( 100*float(np.clip(a[0], -1, +1)) )
 
 	def calc_state(self):
-		self.theta, theta_dot = self.j1.current_position()
 		x, vx = self.slider.current_position()
-		assert( np.isfinite(x) )
+		self.theta, theta_dot = self.j1.current_position()
+		assert(np.isfinite(x))
 
 		if not np.isfinite(x):
 			print("x is inf")
@@ -44,9 +44,12 @@ class InvertedPendulum(MJCFBasedRobot):
 			print("theta_dot is inf")
 			theta_dot = 0
 
+		qpos = np.array([x, self.theta])  # shape (2,)
+		qvel = np.array([vx, theta_dot])  # shape (2,)
+
 		return np.array([
-			x, self.theta,
-			vx, theta_dot])  # np.concatenate([self.sim.data.qpos, self.sim.data.qvel]).ravel()
+			qpos,   # self.sim.data.qpos
+			qvel])  # self.sim.data.qvel
 
 
 class InvertedDoublePendulum(MJCFBasedRobot):
@@ -70,17 +73,19 @@ class InvertedDoublePendulum(MJCFBasedRobot):
 		self.slider.set_motor_torque( 200*float(np.clip(a[0], -1, +1)) )
 
 	def calc_state(self):
+		x, vx = self.slider.current_position()
 		theta, theta_dot = self.j1.current_position()
 		gamma, gamma_dot = self.j2.current_position()
-		x, vx = self.slider.current_position()
-		assert( np.isfinite(x) )
-		qfrc_constraint = 0 # FIND qfrc_constraint in pybullet
+
+		assert(np.isfinite(x))
+
+		qpos = np.array([x, theta, gamma])           # shape (3,)
+		qvel = np.array([vx, theta_dot, gamma_dot])  # shape (3,)
+		qfrc_constraint = np.zeros(3)  # shape (3,)  # TODO: FIND qfrc_constraint in pybullet
 		return np.concatenate([
-			[x],                                              # self.sim.data.qpos[:1],  # cart x pos
-			np.sin([theta, gamma]),                         # np.sin(self.sim.data.qpos[1:]),  # link angles
-			np.cos([theta, gamma]),                         # np.cos(self.sim.data.qpos[1:]),
-			np.clip([vx, theta_dot, gamma_dot], -10 , 10),  # np.clip(self.sim.data.qvel, -10, 10),
-			np.clip([qfrc_constraint,
-					qfrc_constraint,
-					qfrc_constraint], -10, 10)              # np.clip(self.sim.data.qfrc_constraint, -10, 10)
+			qpos[:1],                           # self.sim.data.qpos[:1],  # cart x pos
+			np.sin(qpos[1:]),                   # np.sin(self.sim.data.qpos[1:]),  # link angles
+			np.cos(qpos[1:]),                   # np.cos(self.sim.data.qpos[1:]),
+			np.clip(qvel, -10, 10),  			# np.clip(self.sim.data.qvel, -10, 10),
+			np.clip(qfrc_constraint, -10, 10)   # np.clip(self.sim.data.qfrc_constraint, -10, 10)
 			]).ravel()

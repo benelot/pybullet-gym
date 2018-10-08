@@ -76,7 +76,7 @@ class BaseBulletEnv(gym.Env):
 		if mode != "rgb_array":
 			return np.array([])
 
-		base_pos = [0,0,0]
+		base_pos = [0, 0, 0]
 		if hasattr(self,'robot'):
 			if hasattr(self.robot,'body_xyz'):
 				base_pos = self.robot.body_xyz
@@ -92,7 +92,7 @@ class BaseBulletEnv(gym.Env):
 			fov=60, aspect=float(self._render_width)/self._render_height,
 			nearVal=0.1, farVal=100.0)
 		(_, _, px, _, _) = self._p.getCameraImage(
-		width=self._render_width, height=self._render_height, viewMatrix=view_matrix,
+		width = self._render_width, height=self._render_height, viewMatrix=view_matrix,
 			projectionMatrix=proj_matrix,
 			renderer=pybullet.ER_BULLET_HARDWARE_OPENGL
 			)

@@ -1,6 +1,6 @@
 from .robot_bases import XmlBasedRobot, MJCFBasedRobot, URDFBasedRobot
 import numpy as np
-from pybulletgym.envs.roboschool import gym_utils as ObjectHelper
+from pybulletgym.envs import gym_utils as ObjectHelper
 import pybullet as p
 
 
@@ -79,7 +79,7 @@ class WalkerBase(XmlBasedRobot):
 		return - self.walk_target_dist / self.scene.dt
 
 
-class Hopper(WalkerBase , MJCFBasedRobot):
+class Hopper(WalkerBase, MJCFBasedRobot):
 	foot_list = ["foot"]
 
 	def __init__(self):
@@ -215,7 +215,7 @@ class HumanoidFlagrun(Humanoid):
 			self._p.resetBasePositionAndOrientation(self.flag.bodies[0],[self.walk_target_x, self.walk_target_y, 0.7], [0,0,0,1])
 		else:
 			self.flag = ObjectHelper.get_sphere(self._p, self.walk_target_x, self.walk_target_y, 0.7)
-		self.flag_timeout = 600/self.scene.frame_skip #match Roboschool
+		self.flag_timeout = 600/self.scene.frame_skip # match Roboschool
 
 	def calc_state(self):
 		self.flag_timeout -= 1

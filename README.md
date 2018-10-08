@@ -27,17 +27,13 @@ ThrowerPyBulletEnv-v0                   | WIP | No | No
 StrikerPyBulletEnv-v0                   | WIP | No | No
 | **MuJoCo Envs** |
 InvertedPendulumMuJoCoEnv-v0            | Yes | Yes | Yes
-InvertedDoublePendulumMuJoCoEnv-v0      | No | No | No
-InvertedPendulumSwingupMuJoCoEnv-v0     | No | No | No
+InvertedDoublePendulumMuJoCoEnv-v0      | Yes | Yes | Yes
 ReacherMuJoCoEnv-v0                     | No | No | No
-Walker2DMuJoCoEnv-v0                    | No | No | No
-HalfCheetahMuJoCoEnv-v0                 | No | No | No
-AntMuJoCotEnv-v0                        | No | No | No
-HopperMuJoCoEnv-v0                      | No | No | No
-HumanoidMuJoCoEnv-v0                    | No | No | No
-HumanoidFlagrunMuJoCoEnv-v0             | No | No | No
-HumanoidFlagrunHarderMuJoCoEnv-v0       | No | No | No
-AtlasMuJoCoEnv-v0                       | No | No | No
+Walker2DMuJoCoEnv-v0                    | Yes | No | No
+HalfCheetahMuJoCoEnv-v0                 | Yes | No | No
+AntMuJoCotEnv-v0                        | Yes | No | No
+HopperMuJoCoEnv-v0                      | Yes | No | No
+HumanoidMuJoCoEnv-v0                    | Yes | No | No
 PusherMuJoCoEnv-v0                      | No | No | No
 ThrowerMuJoCoEnv-v0                     | No | No | No
 StrikerMuJoCoEnv-v0                     | No | No | No

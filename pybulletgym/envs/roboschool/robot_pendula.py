@@ -1,8 +1,10 @@
 from .robot_bases import MJCFBasedRobot
 import numpy as np
 
+
 class InvertedPendulum(MJCFBasedRobot):
 	swingup = False
+
 	def __init__(self):
 		MJCFBasedRobot.__init__(self, 'inverted_pendulum.xml', 'cart', action_dim=1, obs_dim=5)
 
