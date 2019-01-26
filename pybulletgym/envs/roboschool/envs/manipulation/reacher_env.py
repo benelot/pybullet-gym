@@ -1,4 +1,4 @@
-from pybulletgym.envs.roboschool.env_bases import BaseBulletEnv
+from pybulletgym.envs.roboschool.envs.env_bases import BaseBulletEnv
 from pybulletgym.envs.roboschool.scenes.scene_bases import SingleRobotEmptyScene
 import numpy as np
 from pybulletgym.envs.roboschool.robots.manipulators.reacher import Reacher
@@ -12,7 +12,7 @@ class ReacherBulletEnv(BaseBulletEnv):
     def create_single_player_scene(self, bullet_client):
         return SingleRobotEmptyScene(bullet_client, gravity=0.0, timestep=0.0165, frame_skip=1)
 
-    def _step(self, a):
+    def step(self, a):
         assert (not self.scene.multiplayer)
         self.robot.apply_action(a)
         self.scene.global_step()

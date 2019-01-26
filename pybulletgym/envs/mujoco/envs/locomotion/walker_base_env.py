@@ -17,7 +17,7 @@ class WalkerBaseMuJoCoEnv(BaseBulletEnv):
         self.stadium_scene = StadiumScene(bullet_client, gravity=9.8, timestep=0.0165/4, frame_skip=4)
         return self.stadium_scene
 
-    def _reset(self):
+    def reset(self):
         if self.stateId >= 0:
             # print("restoreState self.stateId:",self.stateId)
             self._p.restoreState(self.stateId)
@@ -49,7 +49,7 @@ class WalkerBaseMuJoCoEnv(BaseBulletEnv):
     foot_ground_object_names = set(["floor"])  # to distinguish ground and other objects
     joints_at_limit_cost = -0.1	 # discourage stuck joints
 
-    def _step(self, a):
+    def step(self, a):
         if not self.scene.multiplayer:  # if multiplayer, action first applied to all robots, then global step() called, then _step() for all robots with the same actions
             self.robot.apply_action(a)
             self.scene.global_step()

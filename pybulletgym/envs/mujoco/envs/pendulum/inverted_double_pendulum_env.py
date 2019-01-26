@@ -12,7 +12,7 @@ class InvertedDoublePendulumMuJoCoEnv(BaseBulletEnv):
     def create_single_player_scene(self, bullet_client):
         return SingleRobotEmptyScene(bullet_client, gravity=9.8, timestep=0.0165, frame_skip=1)
 
-    def _reset(self):
+    def reset(self):
         if self.stateId >= 0:
             self._p.restoreState(self.stateId)
         r = BaseBulletEnv._reset(self)
@@ -20,7 +20,7 @@ class InvertedDoublePendulumMuJoCoEnv(BaseBulletEnv):
             self.stateId = self._p.saveState()
         return r
 
-    def _step(self, a):
+    def step(self, a):
         self.robot.apply_action(a)
         self.scene.global_step()
         state = self.robot.calc_state()

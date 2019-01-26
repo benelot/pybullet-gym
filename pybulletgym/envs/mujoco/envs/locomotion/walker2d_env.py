@@ -8,7 +8,7 @@ class Walker2DMuJoCoEnv(WalkerBaseMuJoCoEnv):
         self.robot = Walker2D()
         WalkerBaseMuJoCoEnv.__init__(self, self.robot)
 
-    def _step(self, a):
+    def step(self, a):
         if not self.scene.multiplayer:  # if multiplayer, action first applied to all robots, then global step() called, then _step() for all robots with the same actions
             self.robot.apply_action(a)
             self.scene.global_step()

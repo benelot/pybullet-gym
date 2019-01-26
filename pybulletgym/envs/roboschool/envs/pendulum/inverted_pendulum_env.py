@@ -1,4 +1,4 @@
-from pybulletgym.envs.roboschool.env_bases import BaseBulletEnv
+from pybulletgym.envs.roboschool.envs.env_bases import BaseBulletEnv
 from pybulletgym.envs.roboschool.robots.pendula.interted_pendulum import InvertedPendulum, InvertedPendulumSwingup
 from pybulletgym.envs.roboschool.scenes.scene_bases import SingleRobotEmptyScene
 import numpy as np
