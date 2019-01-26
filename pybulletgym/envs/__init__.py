@@ -109,48 +109,48 @@ register(
 # mujoco envs
 register(
 	id='InvertedPendulumMuJoCoEnv-v0',
-	entry_point='pybulletgym.envs.mujoco.gym_pendulum_envs:InvertedPendulumMuJoCoEnv',
+	entry_point='pybulletgym.envs.mujoco.envs.pendulum.inverted_pendulum_env:InvertedPendulumMuJoCoEnv',
 	max_episode_steps=1000,
 	reward_threshold=950.0,
 )
 
 register(
 	id='InvertedDoublePendulumMuJoCoEnv-v0',
-	entry_point='pybulletgym.envs.mujoco.gym_pendulum_envs:InvertedDoublePendulumMuJoCoEnv',
+	entry_point='pybulletgym.envs.mujoco.envs.pendulum.inverted_double_pendulum_env:InvertedDoublePendulumMuJoCoEnv',
 	max_episode_steps=1000,
 	reward_threshold=9100.0,
 )
 
 register(
 	id='Walker2DMuJoCoEnv-v0',
-	entry_point='pybulletgym.envs.mujoco.gym_locomotion_envs:Walker2DMuJoCoEnv',
+	entry_point='pybulletgym.envs.mujoco.envs.locomotion.walker2d_env:Walker2DMuJoCoEnv',
 	max_episode_steps=1000,
 	reward_threshold=2500.0
 )
 register(
 	id='HalfCheetahMuJoCoEnv-v0',
-	entry_point='pybulletgym.envs.mujoco.gym_locomotion_envs:HalfCheetahMuJoCoEnv',
+	entry_point='pybulletgym.envs.mujoco.envs.locomotion.half_cheetah_env:HalfCheetahMuJoCoEnv',
 	max_episode_steps=1000,
 	reward_threshold=3000.0
 )
 
 register(
 	id='AntMuJoCoEnv-v0',
-	entry_point='pybulletgym.envs.mujoco.gym_locomotion_envs:AntMuJoCoEnv',
+	entry_point='pybulletgym.envs.mujoco.envs.locomotion.ant_env:AntMuJoCoEnv',
 	max_episode_steps=1000,
 	reward_threshold=2500.0
 )
 
 register(
 	id='HopperMuJoCoEnv-v0',
-	entry_point='pybulletgym.envs.mujoco.gym_locomotion_envs:HopperMuJoCoEnv',
+	entry_point='pybulletgym.envs.mujoco.envs.locomotion.hopper_env:HopperMuJoCoEnv',
 	max_episode_steps=1000,
 	reward_threshold=2500.0
 )
 
 register(
 	id='HumanoidMuJoCoEnv-v0',
-	entry_point='pybulletgym.envs.mujoco.gym_locomotion_envs:HumanoidMuJoCoEnv',
+	entry_point='pybulletgym.envs.mujoco.envs.locomotion.humanoid_env:HumanoidMuJoCoEnv',
 	max_episode_steps=1000
 )
 

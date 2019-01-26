@@ -48,7 +48,7 @@ class XmlBasedRobot:
 		else:
 			ordered_joints = []
 
-		if np.isscalar(bodies):	# streamline the case where bodies is actually just one body
+		if np.isscalar(bodies):	 # streamline the case where bodies is actually just one body
 			bodies = [bodies]
 
 		dump = 0
@@ -112,7 +112,7 @@ class MJCFBasedRobot(XmlBasedRobot):
 
 	def reset(self, bullet_client):
 
-		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "mjcf", self.model_xml)
+		full_path = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "mjcf", self.model_xml)
 
 		self._p = bullet_client
 		#print("Created bullet_client with id=", self._p._client)
