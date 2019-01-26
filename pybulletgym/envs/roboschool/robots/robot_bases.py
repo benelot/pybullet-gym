@@ -321,7 +321,7 @@ class Joint:
 		)
 
 	def get_state(self):
-		x, vx,_,_ = self._p.getJointState(self.bodies[self.bodyIndex],self.jointIndex)
+		x, vx,_,_ = self._p.getJointState(self.bodies[self.bodyIndex], self.jointIndex)
 		return x, vx
 
 	def get_position(self):
@@ -346,14 +346,14 @@ class Joint:
 		self.set_torque(torque)
 
 	def set_torque(self, torque):
-		self._p.setJointMotorControl2(bodyIndex=self.bodies[self.bodyIndex], jointIndex=self.jointIndex, controlMode=pybullet.TORQUE_CONTROL, force=torque)  #, positionGain=0.1, velocityGain=0.1)
+		self._p.setJointMotorControl2(bodyIndex=self.bodies[self.bodyIndex], jointIndex=self.jointIndex, controlMode=pybullet.TORQUE_CONTROL, force=torque)  # positionGain=0.1, velocityGain=0.1)
 
 	def reset_current_position(self, position, velocity):  # just some synonym method
 		self.reset_position(position, velocity)
 
 	def reset_position(self, position, velocity):
-		self._p.resetJointState(self.bodies[self.bodyIndex],self.jointIndex,targetValue=position, targetVelocity=velocity)
+		self._p.resetJointState(self.bodies[self.bodyIndex], self.jointIndex, targetValue=position, targetVelocity=velocity)
 		self.disable_motor()
 
 	def disable_motor(self):
-		self._p.setJointMotorControl2(self.bodies[self.bodyIndex],self.jointIndex,controlMode=pybullet.POSITION_CONTROL, targetPosition=0, targetVelocity=0, positionGain=0.1, velocityGain=0.1, force=0)
+		self._p.setJointMotorControl2(self.bodies[self.bodyIndex], self.jointIndex, controlMode=pybullet.POSITION_CONTROL, targetPosition=0, targetVelocity=0, positionGain=0.1, velocityGain=0.1, force=0)
