@@ -40,7 +40,7 @@ class BaseBulletEnv(gym.Env):
 
 	def _seed(self, seed=None):
 		self.np_random, seed = gym.utils.seeding.np_random(seed)
-		self.robot.np_random = self.np_random # use the same np_randomizer for robot as for env
+		self.robot.np_random = self.np_random  # use the same np_randomizer for robot as for env
 		return [seed]
 
 	def _reset(self):
@@ -125,8 +125,8 @@ class Camera:
 	def __init__(self):
 		pass
 
-	def move_and_look_at(self,i,j,k,x,y,z):
-		lookat = [x,y,z]
+	def move_and_look_at(self, i, j, k, x, y, z):
+		lookat = [x, y, z]
 		distance = 10
 		yaw = 10
 		self._p.resetDebugVisualizerCamera(distance, yaw, -20, lookat)

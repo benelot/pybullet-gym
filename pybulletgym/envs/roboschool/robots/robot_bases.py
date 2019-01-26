@@ -4,7 +4,7 @@ import numpy as np
 import os, inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
-os.sys.path.insert(0,parentdir)
+os.sys.path.insert(0, parentdir)
 
 
 class XmlBasedRobot:
@@ -58,7 +58,7 @@ class XmlBasedRobot:
 				part_name = part_name.decode("utf8")
 				parts[part_name] = BodyPart(self._p, part_name, bodies, i, -1)
 			for j in range(self._p.getNumJoints(bodies[i])):
-				self._p.setJointMotorControl2(bodies[i],j,pybullet.POSITION_CONTROL,positionGain=0.1,velocityGain=0.1,force=0)
+				self._p.setJointMotorControl2(bodies[i], j, pybullet.POSITION_CONTROL, positionGain=0.1, velocityGain=0.1, force=0)
 				jointInfo = self._p.getJointInfo(bodies[i], j)
 				joint_name=jointInfo[1]
 				part_name=jointInfo[12]
@@ -105,7 +105,7 @@ class MJCFBasedRobot(XmlBasedRobot):
 		self.doneLoading=0
 
 	def reset(self, bullet_client):
-		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "mjcf", self.model_xml)
+		full_path = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "mjcf", self.model_xml)
 
 		self._p = bullet_client
 		# print("Created bullet_client with id=", self._p._client)
@@ -146,7 +146,7 @@ class URDFBasedRobot(XmlBasedRobot):
 		self._p = bullet_client
 		self.ordered_joints = []
 
-		full_path = os.path.join(os.path.dirname(__file__), "..", "assets", "robots", self.model_urdf)
+		full_path = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "robots", self.model_urdf)
 		print(full_path)
 
 		if self.self_collision:
@@ -206,7 +206,7 @@ class SDFBasedRobot(XmlBasedRobot):
 		return 0
 
 
-class PoseHelper: # dummy class to comply to original interface
+class PoseHelper:  # dummy class to comply to original interface
 	def __init__(self, body_part):
 		self.body_part = body_part
 
@@ -244,7 +244,7 @@ class BodyPart:
 		if self.bodyPartIndex == -1:
 			(vx, vy, vz), _ = self._p.getBaseVelocity(self.bodies[self.bodyIndex])
 		else:
-			(x,y,z), (a,b,c,d), _,_,_,_, (vx, vy, vz), (vr,vp,vy) = self._p.getLinkState(self.bodies[self.bodyIndex], self.bodyPartIndex, computeLinkVelocity=1)
+			(x, y, z), (a, b, c, d), _,_,_,_, (vx, vy, vz), (vr, vp, vy) = self._p.getLinkState(self.bodies[self.bodyIndex], self.bodyPartIndex, computeLinkVelocity=1)
 		return np.array([vx, vy, vz])
 
 	def current_position(self):
@@ -337,18 +337,18 @@ class Joint:
 		return vx
 
 	def set_position(self, position):
-		self._p.setJointMotorControl2(self.bodies[self.bodyIndex],self.jointIndex,pybullet.POSITION_CONTROL, targetPosition=position)
+		self._p.setJointMotorControl2(self.bodies[self.bodyIndex], self.jointIndex, pybullet.POSITION_CONTROL, targetPosition=position)
 
 	def set_velocity(self, velocity):
-		self._p.setJointMotorControl2(self.bodies[self.bodyIndex],self.jointIndex,pybullet.VELOCITY_CONTROL, targetVelocity=velocity)
+		self._p.setJointMotorControl2(self.bodies[self.bodyIndex], self.jointIndex, pybullet.VELOCITY_CONTROL, targetVelocity=velocity)
 
 	def set_motor_torque(self, torque):  # just some synonym method
 		self.set_torque(torque)
 
 	def set_torque(self, torque):
-		self._p.setJointMotorControl2(bodyIndex=self.bodies[self.bodyIndex], jointIndex=self.jointIndex, controlMode=pybullet.TORQUE_CONTROL, force=torque) #, positionGain=0.1, velocityGain=0.1)
+		self._p.setJointMotorControl2(bodyIndex=self.bodies[self.bodyIndex], jointIndex=self.jointIndex, controlMode=pybullet.TORQUE_CONTROL, force=torque)  #, positionGain=0.1, velocityGain=0.1)
 
-	def reset_current_position(self, position, velocity): # just some synonym method
+	def reset_current_position(self, position, velocity):  # just some synonym method
 		self.reset_position(position, velocity)
 
 	def reset_position(self, position, velocity):
