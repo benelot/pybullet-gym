@@ -18,7 +18,10 @@ class WalkerBase(XmlBasedRobot):
 
         self.feet = [self.parts[f] for f in self.foot_list]
         self.feet_contact = np.array([0.0 for f in self.foot_list], dtype=np.float32)
-        self.scene.actor_introduce(self)
+        try:
+            self.scene.actor_introduce(self)
+        except AttributeError:
+            pass
         self.initial_z = None
 
     def apply_action(self, a):
@@ -55,23 +58,26 @@ class WalkerBase(XmlBasedRobot):
         )
         vx, vy, vz = np.dot(rot_speed, self.robot_body.speed())  # rotate speed back to body point of view
 
-        more = np.array([ z-self.initial_z,
+        more = np.array([z-self.initial_z,
                           np.sin(angle_to_target), np.cos(angle_to_target),
-                          0.3 * vx , 0.3 * vy , 0.3 * vz ,  # 0.3 is just scaling typical speed into -1..+1, no physical sense here
+                          0.3 * vx, 0.3 * vy, 0.3 * vz,  # 0.3 is just scaling typical speed into -1..+1, no physical sense here
                           r, p], dtype=np.float32)
-        return np.clip( np.concatenate([more] + [j] + [self.feet_contact]), -5, +5)
+        return np.clip(np.concatenate([more] + [j] + [self.feet_contact]), -5, +5)
 
     def calc_potential(self):
         # progress in potential field is speed*dt, typical speed is about 2-3 meter per second, this potential will change 2-3 per frame (not per second),
         # all rewards have rew/frame units and close to 1.0
-        debugmode = 0
-        if debugmode:
-            print("calc_potential: self.walk_target_dist")
-            print(self.walk_target_dist)
-            print("self.scene.dt")
-            print(self.scene.dt)
-            print("self.scene.frame_skip")
-            print(self.scene.frame_skip)
-            print("self.scene.timestep")
-            print(self.scene.timestep)
-        return - self.walk_target_dist / self.scene.dt
+        try:
+            debugmode = 0
+            if debugmode:
+                print("calc_potential: self.walk_target_dist")
+                print(self.walk_target_dist)
+                print("self.scene.dt")
+                print(self.scene.dt)
+                print("self.scene.frame_skip")
+                print(self.scene.frame_skip)
+                print("self.scene.timestep")
+                print(self.scene.timestep)
+            return - self.walk_target_dist / self.scene.dt
+        except AttributeError:
+            return - self.walk_target_dist
