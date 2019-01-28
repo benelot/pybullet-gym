@@ -47,7 +47,7 @@ class XmlBasedRobot:
 		else:
 			ordered_joints = []
 
-		if np.isscalar(bodies):	# streamline the case where bodies is actually just one body
+		if np.isscalar(bodies):	 # streamline the case where bodies is actually just one body
 			bodies = [bodies]
 
 		dump = 0
@@ -90,6 +90,9 @@ class XmlBasedRobot:
 
 		return parts, joints, ordered_joints, self.robot_body
 
+	def robot_specific_reset(self, physicsClient):
+		pass
+
 	def reset_pose(self, position, orientation):
 		self.parts[self.robot_name].reset_pose(position, orientation)
 
@@ -102,7 +105,7 @@ class MJCFBasedRobot(XmlBasedRobot):
 	def __init__(self, model_xml, robot_name, action_dim, obs_dim, self_collision=True):
 		XmlBasedRobot.__init__(self, robot_name, action_dim, obs_dim, self_collision)
 		self.model_xml = model_xml
-		self.doneLoading=0
+		self.doneLoading = 0
 
 	def reset(self, bullet_client):
 		full_path = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "mjcf", self.model_xml)
@@ -282,6 +285,12 @@ class BodyPart:
 
 
 class Joint:
+	JOINT_REVOLUTE_TYPE = 0
+	JOINT_PLANAR_TYPE = 1
+	JOINT_PRISMATIC_TYPE = 2
+	JOINT_SPHERICAL_TYPE = 3
+	JOINT_FIXED_TYPE = 4
+
 	def __init__(self, bullet_client, joint_name, bodies, bodyIndex, jointIndex):
 		self.bodies = bodies
 		self._p = bullet_client
@@ -300,7 +309,7 @@ class Joint:
 	def set_state(self, x, vx):
 		self._p.resetJointState(self.bodies[self.bodyIndex], self.jointIndex, x, vx)
 
-	def current_position(self): # just some synonym method
+	def current_position(self):  # just some synonym method
 		return self.get_state()
 
 	def current_relative_position(self):
