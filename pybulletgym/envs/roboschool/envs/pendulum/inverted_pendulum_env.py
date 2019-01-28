@@ -1,6 +1,7 @@
 from pybulletgym.envs.roboschool.envs.env_bases import BaseBulletEnv
 from pybulletgym.envs.roboschool.robots.pendula.interted_pendulum import InvertedPendulum, InvertedPendulumSwingup
 from pybulletgym.envs.roboschool.scenes.scene_bases import SingleRobotEmptyScene
+import pybulletgym.envs.roboschool.rewards.inverse_pendulum_rewards as inverse_pendulum_rewards
 import numpy as np
 
 
@@ -9,6 +10,8 @@ class InvertedPendulumBulletEnv(BaseBulletEnv):
         self.robot = InvertedPendulum()
         BaseBulletEnv.__init__(self, self.robot)
         self.stateId = -1
+        self.reward_funcs = []
+        self.reward_funcs.append(inverse_pendulum_rewards.calc_reward)
 
     def create_single_player_scene(self, bullet_client):
         return SingleRobotEmptyScene(bullet_client, gravity=9.8, timestep=0.0165, frame_skip=1)
@@ -26,14 +29,15 @@ class InvertedPendulumBulletEnv(BaseBulletEnv):
     def step(self, a):
         self.robot.apply_action(a)
         self.scene.global_step()
-        state = self.robot.calc_state()  # sets self.pos_x self.pos_y
-        vel_penalty = 0
-        if self.robot.swingup:
-            reward = np.cos(self.robot.theta)
-            done = False
-        else:
-            reward = 1.0
-            done = np.abs(self.robot.theta) > .2
+
+        reward = 0
+        done = False
+        state = self.robot.calc_state()
+        for f in self.reward_funcs:
+            f_reward, f_done = f(self.robot)
+            reward += f_reward
+            done |= f_done
+
         self.rewards = [float(reward)]
         self.HUD(state, a, done)
         return state, sum(self.rewards), done, {}
@@ -47,3 +51,5 @@ class InvertedPendulumSwingupBulletEnv(InvertedPendulumBulletEnv):
         self.robot = InvertedPendulumSwingup()
         BaseBulletEnv.__init__(self, self.robot)
         self.stateId = -1
+        self.reward_funcs = []
+        self.reward_funcs.append(inverse_pendulum_rewards.calc_reward)
