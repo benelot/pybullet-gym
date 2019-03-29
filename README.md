@@ -66,16 +66,16 @@ should know:
 
 First, you can perform a minimal installation of OpenAI Gym with
 ```bash
-	  git clone https://github.com/openai/gym.git
-	  cd gym
-	  pip install -e .
+git clone https://github.com/openai/gym.git
+cd gym
+pip install -e .
 ```
 
 Then, the easiest way to install Pybullet-Gym is to clone the repository and install locally
 ```bash
-	  git clone https://github.com/benelot/pybullet-gym.git
-	  cd gym
-	  pip install -e .
+git clone https://github.com/benelot/pybullet-gym.git
+cd gym
+pip install -e .
 ```
 
 Important Note: *Do not* use `python setup.py install` as this will not copy the assets (you might get missing SDF file errors).
