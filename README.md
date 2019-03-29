@@ -61,21 +61,39 @@ should know:
 
 **In addition to the basic concepts of reinforcement learning, this framework extends the notion of an environment into two subconcepts being the robot (the agents directly controllable body) and the scene (all things the agents interacts with). Implementing RL environments in this way allows us to switch parts of the environment to generate new robot-scene combinations.**
 
-## Installation
 
-You can perform a minimal install of ``gym`` with:
+## Installing Pybullet-Gym
 
+First, you can perform a minimal installation of OpenAI Gym with
 ```bash
-	  git clone https://github.com/openai/gym.git
-	  cd gym
-	  pip install -e .
+git clone https://github.com/openai/gym.git
+cd gym
+pip install -e .
 ```
+
+Then, the easiest way to install Pybullet-Gym is to clone the repository and install locally
+```bash
+git clone https://github.com/benelot/pybullet-gym.git
+cd pybullet-gym
+pip install -e .
+```
+
+Important Note: *Do not* use `python setup.py install` as this will not copy the assets (you might get missing SDF file errors).
+
+Finally, to test installation, open python and run
+```python
+import gym  # open ai gym
+import pybulletgym  # register PyBullet enviroments with open ai gym
+
+env = gym.make('HumanoidPyBulletEnv-v0')
+env.reset()  # should return a state vector if everything worked
+```
+
 
 ## Supported systems
 
 We currently support Linux, Windows and OS X running Python 2.7 or 3.5.
 
-## Pip version
 
 To run ``pip install -e '.[all]'``, you'll need a semi-recent pip.
 Please make sure your pip is at least at version ``1.5.0``. You can
