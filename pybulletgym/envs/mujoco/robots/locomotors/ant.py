@@ -1,7 +1,7 @@
 from pybulletgym.envs.mujoco.robots.locomotors.walker_base import WalkerBase
 from pybulletgym.envs.mujoco.robots.robot_bases import MJCFBasedRobot
 import numpy as np
-
+import pybullet
 
 class Ant(WalkerBase, MJCFBasedRobot):
     foot_list = ['front_left_foot', 'front_right_foot', 'left_back_foot', 'right_back_foot']
@@ -26,4 +26,4 @@ class Ant(WalkerBase, MJCFBasedRobot):
         ])
 
     def alive_bonus(self, z, pitch):
-        return +1 if z > 0.26 else -1  # 0.25 is central sphere rad, die if it scrapes the ground
+        return +1# if z > 0.26 else -1  # 0.25 is central sphere rad, die if it scrapes the ground #TODO Cambia questo in modo che muoia solo se si capota

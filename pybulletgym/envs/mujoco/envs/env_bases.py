@@ -105,6 +105,10 @@ class BaseBulletEnv(gym.Env):
 			)
 		rgb_array = np.array(px)
 		rgb_array = rgb_array[:, :, :3]
+		if rgb_array.dtype is np.uint8:
+			rgb_array = 255 -	rgb_array
+		else:
+			rgb_array = 1 - rgb_array
 		return rgb_array
 
 	def _close(self):

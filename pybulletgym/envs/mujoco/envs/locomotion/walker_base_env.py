@@ -34,6 +34,9 @@ class WalkerBaseMuJoCoEnv(BaseBulletEnv):
             self.stateId=self._p.saveState()
         #print("saving state self.stateId:",self.stateId)
 
+        for link in range(-1, 20): #Changes the color of the robot Ant
+            p.changeVisualShape(1, link, rgbaColor=[0.2, 0.3, 0.4, 1])
+
         return r
 
     def move_robot(self, init_x, init_y, init_z):
