@@ -31,7 +31,7 @@ InvertedDoublePendulumMuJoCoEnv-v0      | Yes | Yes | Yes
 ReacherMuJoCoEnv-v0                     | No | No | No
 Walker2DMuJoCoEnv-v0                    | Yes | No | No
 HalfCheetahMuJoCoEnv-v0                 | Yes | No | No
-AntMuJoCotEnv-v0                        | Yes | No | No
+AntMuJoCoEnv-v0                        | Yes | No | No
 HopperMuJoCoEnv-v0                      | Yes | No | No
 HumanoidMuJoCoEnv-v0                    | Yes | No | No
 PusherMuJoCoEnv-v0                      | No | No | No
