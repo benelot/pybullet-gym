@@ -73,7 +73,7 @@ pip install -e .
 
 Then, the easiest way to install Pybullet-Gym is to clone the repository and install locally
 ```bash
-git clone https://github.com/benelot/pybullet-gym.git
+git clone https://github.com/GPaolo/pybullet-gym.git
 cd pybullet-gym
 pip install -e .
 ```
