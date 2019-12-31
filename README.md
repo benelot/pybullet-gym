@@ -149,7 +149,7 @@ mujoco.</li>
 <li>[OPENAI ROBOTICS GYMS] Next in line would be the robotics gyms in OpenAI.
 These are particularly delicate simulations and might take some tuning to
 even be simulatable in pybullet.</li>
-4.[DEEPMIND CONTROL SUITE] Then there is Deepmind Control Suite, another set
+<li>[DEEPMIND CONTROL SUITE] Then there is Deepmind Control Suite, another set
 of gyms which are in mujoco and need to be freed. </li>
 </ol>
 
