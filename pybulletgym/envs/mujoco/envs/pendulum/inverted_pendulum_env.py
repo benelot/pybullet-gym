@@ -29,7 +29,7 @@ class InvertedPendulumMuJoCoEnv(BaseBulletEnv):
         state = self.robot.calc_state()  # sets self.pos_x self.pos_y
         vel_penalty = 0
         reward = 1.0
-        done = not np.isfinite(state).all() or np.abs(state[1]) > .2
+        done = not (np.isfinite(state).all() or np.abs(state[1]) > .2)
         self.rewards = [float(reward)]
         self.HUD(state, a, done)
         return state, sum(self.rewards), done, {}
