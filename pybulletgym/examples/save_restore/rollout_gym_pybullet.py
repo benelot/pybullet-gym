@@ -1,10 +1,8 @@
 """ An example of a Monte-Carlo rollout from a given state envolving saving
     and loading the state of the environment...
 """
-import time
 import numpy as np
-import torch
-import torch.multiprocessing as mp
+import multiprocessing as mp
 import gym
 import pybulletgym
 np.set_printoptions(precision=4, suppress=True)
