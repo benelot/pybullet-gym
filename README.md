@@ -1,6 +1,9 @@
 PyBullet Gymperium
 -----------
 
+
+*The new wind wind environments are 'HumanoidWindPyBulletEnv-v0', 'HopperWindPyBulletEnv-v0', 'Walker2DWindPyBulletEnv-v0'
+
 *PyBullet Gymperium is an open-source implementation of the OpenAI Gym MuJoCo environments for use with the OpenAI Gym Reinforcement Learning Research Platform in support of open research.*
 
 OpenAI gym is currently one of the most widely used toolkit for developing and comparing reinforcement learning algorithms. Unfortunately, for several challenging continuous control environments it requires the user to install MuJoCo, a commercial physics engine which requires a license to run for longer than 30 days. Such a commercial barrier hinders open research, especially in the perspective that other appropriate physics engines exist. This repository provides alternative implementations of the original MuJoCo environments which can be used for free. The environments have been reimplemented using [BulletPhysics'](https://github.com/bulletphysics/bullet3) python wrapper pybullet, such that they seamlessly integrate into the OpenAI gym framework. In order to show the usability of the new environments, several RL agents from the [Tensorforce](https://github.com/reinforceio/tensorforce) Reinforcement Learning Library are configured to be trainable out of the box. To simplify research with the implemented environment, each environment is featured with pretrained agents which serve as unit tests for the implementations and could well serve as baselines for other purposes. <!--To further simplify the training of agents, a Trainer class was implemented which helps to capture commandline arguments in a unified fashion. The Trainer provides a set of standard arguments, but additional arguments can be defined by the agent and the environment to enable the researcher to provide special parameters to either one.-->
