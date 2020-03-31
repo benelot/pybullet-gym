@@ -47,6 +47,6 @@ class InvertedPendulum(MJCFBasedRobot):
         qpos = np.array([x, self.theta])  # shape (2,)
         qvel = np.array([vx, theta_dot])  # shape (2,)
 
-        return np.array([
+        return np.concatenate([
             qpos,   # self.sim.data.qpos
-            qvel])  # self.sim.data.qvel
+            qvel]).ravel() # self.sim.data.qvel
