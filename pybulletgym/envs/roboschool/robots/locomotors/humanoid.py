@@ -7,7 +7,7 @@ class Humanoid(WalkerBase, MJCFBasedRobot):
     self_collision = True
     foot_list = ["right_foot", "left_foot"]  # "left_hand", "right_hand"
 
-    def __init__(self, random_yaw = False, random_lean=False):
+    def __init__(self, random_yaw=False, random_lean=False):
         WalkerBase.__init__(self, power=0.41)
         MJCFBasedRobot.__init__(self, 'humanoid_symmetric.xml', 'torso', action_dim=17, obs_dim=44)
         # 17 joints, 4 of them important for walking (hip, knee), others may as well be turned off, 17/4 = 4.25
