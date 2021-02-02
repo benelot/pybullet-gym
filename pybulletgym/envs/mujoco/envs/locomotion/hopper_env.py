@@ -1,5 +1,5 @@
 from pybulletgym.envs.mujoco.envs.locomotion.walker_base_env import WalkerBaseMuJoCoEnv
-from pybulletgym.envs.roboschool.robots.locomotors import Hopper
+from pybulletgym.envs.mujoco.robots.locomotors.hopper import Hopper
 import numpy as np
 
 
