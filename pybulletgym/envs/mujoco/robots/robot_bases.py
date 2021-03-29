@@ -140,12 +140,12 @@ class URDFBasedRobot(XmlBasedRobot):
 	Base class for URDF .xml based robots.
 	"""
 
-	def __init__(self, model_urdf, robot_name, action_dim, obs_dim, basePosition=[0, 0, 0], baseOrientation=[0, 0, 0, 1], fixed_base=False, self_collision=False):
+	def __init__(self, model_urdf, robot_name, action_dim, obs_dim, basePosition=None, baseOrientation=None, fixed_base=False, self_collision=False):
 		XmlBasedRobot.__init__(self, robot_name, action_dim, obs_dim, self_collision)
 
 		self.model_urdf = model_urdf
-		self.basePosition = basePosition
-		self.baseOrientation = baseOrientation
+		self.basePosition = basePosition if basePosition is not None else [0, 0, 0]
+		self.baseOrientation = baseOrientation if baseOrientation is not None else [0, 0, 0, 1]
 		self.fixed_base = fixed_base
 
 	def reset(self, bullet_client):
@@ -185,8 +185,13 @@ class SDFBasedRobot(XmlBasedRobot):
 	Base class for SDF robots in a Scene.
 	"""
 
-	def __init__(self, model_sdf, robot_name, action_dim, obs_dim, basePosition=[0, 0, 0], baseOrientation=[0, 0, 0, 1], fixed_base=False, self_collision=False):
+	def __init__(self, model_sdf, robot_name, action_dim, obs_dim, basePosition=None, baseOrientation=None, fixed_base=False, self_collision=False):
 		XmlBasedRobot.__init__(self, robot_name, action_dim, obs_dim, self_collision)
+
+		if basePosition is None:
+			basePosition = [0, 0, 0]
+		if baseOrientation is None:
+			baseOrientation = [0, 0, 0, 1]
 
 		self.model_sdf = model_sdf
 		self.fixed_base = fixed_base
@@ -275,7 +280,11 @@ class BodyPart:
 	def reset_orientation(self, orientation):
 		self._p.resetBasePositionAndOrientation(self.bodies[self.bodyIndex], self.get_position(), orientation)
 
-	def reset_velocity(self, linearVelocity=[0,0,0], angularVelocity =[0,0,0]):
+	def reset_velocity(self, linearVelocity=None, angularVelocity=None):
+		if linearVelocity is None:
+			linearVelocity = [0, 0, 0]
+		if angularVelocity is None:
+			angularVelocity = [0, 0, 0]
 		self._p.resetBaseVelocity(self.bodies[self.bodyIndex], linearVelocity, angularVelocity)
 
 	def reset_pose(self, position, orientation):
