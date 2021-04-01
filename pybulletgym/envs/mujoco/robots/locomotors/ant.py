@@ -26,4 +26,4 @@ class Ant(WalkerBase, MJCFBasedRobot):
         ])
 
     def alive_bonus(self, z, pitch):
-        return +1 if z > 0.26 else -1  # 0.25 is central sphere rad, die if it scrapes the ground
+        return +1 if z - self.initial_z > 0.26 else -1  # 0.25 is central sphere rad, die if it scrapes the ground
