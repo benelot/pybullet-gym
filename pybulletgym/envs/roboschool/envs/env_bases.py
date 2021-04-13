@@ -1,3 +1,4 @@
+import os
 import gym, gym.spaces, gym.utils, gym.utils.seeding
 import numpy as np
 import pybullet
@@ -113,6 +114,17 @@ class BaseBulletEnv(gym.Env):
 	# for extension of this class.
 	def step(self, *args, **kwargs):
 		return self._step(*args, **kwargs)
+
+	def save_env_state(self, file_path):
+		self._p.saveBullet(file_path)
+
+	def restore_env_state(self, file_path):
+		self._p.restoreState(fileName=file_path)
+		try:
+			os.remove(file_path)
+		except FileNotFoundError:
+			pass
+
 
 	if parse_version(gym.__version__)>=parse_version('0.9.6'):
 		close = _close
